@@ -1,0 +1,80 @@
+# CardFolio 功能需求規格
+
+> 2026-07-08 透過需求問答確認。此文件是開發的依據，變更需求時先改這裡。
+
+## 產品定位
+
+個人卡牌投資記帳 + 收藏圖鑑 PWA。記錄 PTCG 與 One Piece 卡牌（單卡與密封品）的買賣，計算投資損益；同時追蹤收藏進度。手機優先操作，未來可能開放多人使用。
+
+## 已確認的需求決策
+
+### 記帳核心
+
+| 決策點 | 結論 |
+|---|---|
+| 買入紀錄欄位 | 金額、日期、**通路/店家**、**幣別＋匯率**、**運費與手續費**、**品相與鑑定狀態**（PSA/BGS 分數） |
+| 成本計算方式 | **逐筆記錄（lot-based）**：每次買入為獨立一筆，賣出時指定從哪筆賣出，損益精確到單筆 |
+| 賣出功能 | **部分賣出**（買 5 張賣 2 張）、**買家/訂單備註**。平台費率不自動計算，直接記實收金額與費用即可 |
+| 幣別 | 交易以**原幣＋當時匯率**儲存；儀表板顯示幣別**可切換**（TWD / JPY / USD） |
+| 拆盒 | **不做拆盒成本分攤**。密封品與單卡各自獨立記帳，無成本轉移功能 |
+| 市價追蹤 | **未來再做**（Phase 5+）。先留手動市價欄位，價格爬蟲後期評估 |
+
+### 收藏圖鑑（核心功能，非選配）
+
+- 收集進度：以系列/彈數為單位，對照卡牌目錄顯示「已收集 n / 全 m 張」
+- 願望清單：想收的卡先加清單，之後買入時可從清單轉入
+- 依賴卡牌目錄，隨 Phase 3 一起上線
+
+### 卡牌目錄與爬蟲
+
+三個語系都需要，按取得成本分階段：
+
+1. **英文**（最省力）：PTCG 接 pokemontcg.io 免費 API；OPCG 爬 en.onepiece-cardgame.com
+2. **日文**：PTCG 爬 pokemon-card.com；OPCG 爬 onepiece-cardgame.com
+3. **繁體中文**：PTCG 亞洲版官網、OPCG 中文官網（結構待調查）
+
+同一張卡的不同語言版本視為**不同的收藏/交易對象**（價格不同），但可透過卡號關聯。
+
+### 介面與體驗
+
+- **輸入速度優先**：記住上次的通路/幣別作為預設值、最少步驟完成一筆
+- **批次輸入**：一張訂單多張卡，可在同一畫面連續新增
+- 儀表板指標：**總投入／總回收／已實現損益／ROI**、**單卡損益排行**（賺最多/賠最多）
+- 登入：**Google OAuth**（Supabase Auth）
+- 資料匯出 CSV：要做，排在儀表板之後（不急）
+
+## 資料模型
+
+```
+users            Supabase Auth 管理
+games            ptcg / opcg
+card_sets        系列彈數（含語系）：code, name, game_id, language
+cards            卡牌目錄（爬蟲維護）：set_id, card_no, name, rarity, language, image_url
+inventory_items  持有項目：user_id, type(card|sealed), card_id?, custom_name?,
+                 condition, grading(PSA/BGS+分數), status(持有|已售出|已拆)
+purchase_lots    買入批次：item 關聯, qty, 原幣金額, currency, exchange_rate,
+                 運費/手續費, channel(通路), purchased_at, note
+sales            賣出：lot 關聯, qty(支援部分賣出), 原幣金額, currency, exchange_rate,
+                 費用, buyer_note, sold_at
+wishlist         願望清單：user_id, card_id, priority, note
+```
+
+損益計算：`已實現損益 = Σ(賣出淨額 − 對應 lot 的攤提成本)`，成本含運費手續費，全部以原幣＋匯率換算成顯示幣別。
+
+收集進度：`inventory_items(type=card, 持有中)` 對 `cards` 按 set 分組統計。
+
+## 開發階段（依每週 <5 小時切分）
+
+- **Phase 0 — 地基**：Next.js 腳手架、Supabase 專案＋schema、Google 登入、Vercel 部署、PWA 設定
+- **Phase 1 — 手動記帳 MVP**：買入（含批次輸入）/賣出（含部分賣出）/持有清單/三大數字（總投入、總回收、損益）。卡名先自由文字，**此階段結束即可真實使用**
+- **Phase 2 — 卡牌目錄**：英文（API）→ 日文（爬蟲）→ 繁中（爬蟲），GitHub Actions 排程
+- **Phase 3 — 選卡整合＋收藏圖鑑**：搜尋/自動完成選卡、卡圖、收集進度、願望清單
+- **Phase 4 — 儀表板＋匯出**：ROI、單卡損益排行、幣別切換、CSV 匯出
+- **Phase 5+**：市價爬蟲與未實現損益、多人開放
+
+## 明確不做（本版）
+
+- 拆盒成本自動分攤
+- 平台費率表自動計算
+- 牌組（deck）構築功能
+- 即時市價（Phase 5+ 再評估）

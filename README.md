@@ -44,11 +44,11 @@ cardfolio/
 
 ## 開發階段
 
-- [ ] **Phase 0 — 地基**：repo、Next.js 腳手架、Supabase、Vercel 部署
-- [ ] **Phase 1 — 手動記帳 MVP**：手動新增買入/賣出、持有清單、總損益（不等爬蟲，先真實使用）
-- [ ] **Phase 2 — 卡牌目錄**：接 API + 爬蟲，排程更新卡表
-- [ ] **Phase 3 — 選卡整合**：搜尋/自動完成選卡、卡圖顯示
-- [ ] **Phase 4 — 儀表板**：ROI、月度損益、庫存明細
-- [ ] **Phase 5+**：多人開放、拆盒成本分攤、市價快照追蹤
+- [ ] **Phase 0 — 地基**：repo、Next.js 腳手架、Supabase schema、Google 登入、Vercel 部署
+- [ ] **Phase 1 — 手動記帳 MVP**：買入（批次輸入）/賣出（部分賣出）、持有清單、總損益（不等爬蟲，先真實使用）
+- [ ] **Phase 2 — 卡牌目錄**：英文（API）→ 日文（爬蟲）→ 繁中（爬蟲），排程更新
+- [ ] **Phase 3 — 選卡整合＋收藏圖鑑**：搜尋選卡、卡圖、收集進度、願望清單
+- [ ] **Phase 4 — 儀表板＋匯出**：ROI、單卡損益排行、幣別切換、CSV 匯出
+- [ ] **Phase 5+**：市價追蹤與未實現損益、多人開放
 
-詳細功能規格見 [docs/](docs/)。
+詳細功能規格見 [docs/requirements.md](docs/requirements.md)。
