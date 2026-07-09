@@ -1,16 +1,18 @@
 "use client";
 
 import { Suspense, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 function LoginContent() {
-  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const [loading, setLoading] = useState<"google" | "guest" | null>(null);
+  const [guestError, setGuestError] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const authError = searchParams.get("error");
 
   const signInWithGoogle = async () => {
-    setLoading(true);
+    setLoading("google");
     const supabase = createClient();
     await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -18,6 +20,20 @@ function LoginContent() {
         redirectTo: `${window.location.origin}/auth/callback`,
       },
     });
+  };
+
+  const signInAsGuest = async () => {
+    setLoading("guest");
+    setGuestError(null);
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInAnonymously();
+    if (error) {
+      setGuestError("訪客登入目前無法使用，請改用 Google 登入");
+      setLoading(null);
+      return;
+    }
+    router.push("/");
+    router.refresh();
   };
 
   return (
@@ -37,7 +53,7 @@ function LoginContent() {
 
       <button
         onClick={signInWithGoogle}
-        disabled={loading}
+        disabled={loading !== null}
         className="flex items-center gap-3 rounded-full border border-gray-300 bg-white px-6 py-3 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden>
@@ -58,8 +74,26 @@ function LoginContent() {
             d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
           />
         </svg>
-        {loading ? "前往 Google 登入…" : "使用 Google 登入"}
+        {loading === "google" ? "前往 Google 登入…" : "使用 Google 登入"}
       </button>
+
+      <div className="flex flex-col items-center gap-2">
+        <button
+          onClick={signInAsGuest}
+          disabled={loading !== null}
+          className="text-sm text-gray-500 underline underline-offset-4 disabled:opacity-50 dark:text-gray-400"
+        >
+          {loading === "guest" ? "進入中…" : "以訪客身分試用"}
+        </button>
+        <p className="text-xs text-gray-400 dark:text-gray-500">
+          訪客資料只存在這個瀏覽器，清除瀏覽資料或換裝置就找不回來
+        </p>
+        {guestError && (
+          <p className="rounded-md bg-red-50 px-4 py-2 text-xs text-red-600 dark:bg-red-950 dark:text-red-400">
+            {guestError}
+          </p>
+        )}
+      </div>
     </main>
   );
 }

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import BottomNav from "@/components/BottomNav";
 import { fmtTWD } from "@/lib/format";
@@ -27,22 +28,7 @@ export default async function Home() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
-    return (
-      <main className="flex min-h-screen flex-col items-center justify-center gap-6 px-6 text-center">
-        <h1 className="text-4xl font-bold tracking-tight">CardFolio</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
-          卡牌投資記帳・收藏圖鑑
-        </p>
-        <Link
-          href="/login"
-          className="rounded-full bg-foreground px-6 py-3 text-sm font-medium text-background transition hover:opacity-90"
-        >
-          登入開始使用
-        </Link>
-      </main>
-    );
-  }
+  if (!user) redirect("/login");
 
   const { data: lotsData } = await supabase
     .from("purchase_lots")
