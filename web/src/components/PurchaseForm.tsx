@@ -24,9 +24,8 @@ const emptyRow = (): PurchaseRow => ({
   note: "",
 });
 
-const inputCls =
-  "w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm focus:border-gray-500 focus:outline-none dark:border-gray-700";
-const labelCls = "block text-xs text-gray-500 dark:text-gray-400 mb-1";
+const inputCls = "field";
+const labelCls = "field-label";
 
 export default function PurchaseForm({
   initialCard,
@@ -100,7 +99,7 @@ export default function PurchaseForm({
   return (
     <div className="flex flex-col gap-5">
       {/* 整單共用欄位 */}
-      <section className="grid grid-cols-2 gap-3 rounded-xl border border-gray-200 p-4 dark:border-gray-800">
+      <section className="grid grid-cols-2 gap-3 glass p-4">
         <div>
           <label className={labelCls}>買入日期</label>
           <input
@@ -160,16 +159,16 @@ export default function PurchaseForm({
       {rows.map((row, i) => (
         <section
           key={i}
-          className="flex flex-col gap-3 rounded-xl border border-gray-200 p-4 dark:border-gray-800"
+          className="flex flex-col gap-3 glass p-4"
         >
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+            <span className="text-xs font-semibold text-muted">
               項目 {i + 1}
             </span>
             {rows.length > 1 && (
               <button
                 type="button"
-                className="text-xs text-red-500"
+                className="text-xs text-red-400"
                 onClick={() => setRows((rs) => rs.filter((_, j) => j !== i))}
               >
                 移除
@@ -289,14 +288,14 @@ export default function PurchaseForm({
 
       <button
         type="button"
-        className="rounded-xl border border-dashed border-gray-300 py-3 text-sm text-gray-500 dark:border-gray-700 dark:text-gray-400"
+        className="rounded-xl border border-dashed border-border py-3 text-sm text-muted glass-hover"
         onClick={() => setRows((rs) => [...rs, emptyRow()])}
       >
         ＋ 再加一筆（同一張訂單）
       </button>
 
       {error && (
-        <p className="rounded-md bg-red-50 px-4 py-2 text-sm text-red-600 dark:bg-red-950 dark:text-red-400">
+        <p className="glass rounded-md px-4 py-2 text-sm text-red-400">
           {error}
         </p>
       )}
@@ -305,7 +304,7 @@ export default function PurchaseForm({
         type="button"
         disabled={submitting}
         onClick={submit}
-        className="rounded-full bg-foreground py-3 text-sm font-medium text-background disabled:opacity-50"
+        className="btn-accent py-3 text-sm disabled:opacity-50"
       >
         {submitting ? "儲存中…" : `儲存 ${rows.length} 筆買入`}
       </button>

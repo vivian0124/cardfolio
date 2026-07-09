@@ -67,25 +67,23 @@ export default async function CollectionPage({
   }
 
   const tabCls = (active: boolean) =>
-    `rounded-full px-4 py-1.5 text-sm ${
-      active
-        ? "bg-foreground font-medium text-background"
-        : "border border-gray-300 text-gray-500 dark:border-gray-700 dark:text-gray-400"
+    `shrink-0 whitespace-nowrap rounded-full px-4 py-1.5 text-sm ${
+      active ? "btn-accent" : "btn-ghost text-muted"
     }`;
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col gap-4 px-4 pb-24 pt-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">收藏圖鑑</h1>
+        <h1 className="text-xl font-bold text-accent">收藏圖鑑</h1>
         <Link
           href="/wishlist"
-          className="text-sm text-gray-500 underline-offset-4 hover:underline dark:text-gray-400"
+          className="text-sm text-muted underline-offset-4 hover:underline"
         >
           ❤️ 願望清單
         </Link>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex gap-2 overflow-x-auto pb-1">
         {GAMES.map((g) => (
           <Link
             key={g.id}
@@ -95,9 +93,7 @@ export default async function CollectionPage({
             {g.label}
           </Link>
         ))}
-        <span className="mx-1 self-center text-gray-300 dark:text-gray-600">
-          |
-        </span>
+        <span className="mx-1 shrink-0 self-center text-muted">|</span>
         {LANGS.map((l) => (
           <Link
             key={l.id}
@@ -110,7 +106,7 @@ export default async function CollectionPage({
       </div>
 
       {sets.length === 0 && (
-        <p className="py-16 text-center text-sm text-gray-500 dark:text-gray-400">
+        <p className="py-16 text-center text-sm text-muted">
           這個語系的卡表還沒同步進來
         </p>
       )}
@@ -125,26 +121,26 @@ export default async function CollectionPage({
             <Link
               key={s.id}
               href={`/collection/${s.id}`}
-              className="flex flex-col gap-1.5 rounded-xl border border-gray-200 p-4 dark:border-gray-800"
+              className="glass glass-hover flex flex-col gap-1.5 p-4"
             >
               <div className="flex items-center justify-between gap-2">
                 <span className="min-w-0 truncate text-sm font-medium">
                   {s.name}
                 </span>
-                <span className="shrink-0 text-xs text-gray-500 dark:text-gray-400">
+                <span className="mono-num shrink-0 text-xs text-muted">
                   {total ? `${owned} / ${total}` : owned > 0 ? `持有 ${owned}` : ""}
                 </span>
               </div>
-              <div className="flex items-center justify-between gap-2 text-xs text-gray-500 dark:text-gray-400">
+              <div className="flex items-center justify-between gap-2 text-xs text-muted">
                 <span>
                   {s.code}
                   {s.release_date && `・${s.release_date}`}
                 </span>
               </div>
               {pct !== null && (
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+                <div className="progress-track">
                   <div
-                    className="h-full rounded-full bg-green-500"
+                    className="progress-fill"
                     style={{ width: `${pct}%` }}
                   />
                 </div>

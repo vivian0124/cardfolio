@@ -92,10 +92,7 @@ export default async function ItemDetailPage({
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col gap-5 px-4 pb-24 pt-8">
       <div>
-        <Link
-          href="/items"
-          className="text-xs text-gray-500 dark:text-gray-400"
-        >
+        <Link href="/items" className="text-xs text-muted">
           ← 庫存
         </Link>
         <div className="mt-2 flex items-start justify-between gap-3">
@@ -107,57 +104,46 @@ export default async function ItemDetailPage({
             action={deleteItem.bind(null, item.id)}
           />
         </div>
-        <div className="mt-1 flex flex-wrap gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+        <div className="mt-1 flex flex-wrap gap-1.5 text-xs text-muted">
           <span>{item.item_type === "card" ? "單卡" : "密封品"}</span>
           {item.condition && <span>・{item.condition}</span>}
           {item.grading && <span>・{item.grading}</span>}
           {item.status === "sold" && <span>・已售出</span>}
         </div>
-        {item.note && (
-          <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-            {item.note}
-          </p>
-        )}
+        {item.note && <p className="mt-1 text-xs text-muted">{item.note}</p>}
       </div>
 
       <section className="grid grid-cols-2 gap-3">
-        <div className="rounded-xl border border-gray-200 p-4 text-center dark:border-gray-700">
-          <div className="text-xs text-gray-500 dark:text-gray-400">
-            總成本
+        <div className="glass p-4 text-center">
+          <div className="text-xs text-muted">總成本</div>
+          <div className="mono-num mt-1 text-lg font-semibold">
+            {fmtTWD(totalCost)}
           </div>
-          <div className="mt-1 text-lg font-semibold">{fmtTWD(totalCost)}</div>
         </div>
-        <div className="rounded-xl border border-gray-200 p-4 text-center dark:border-gray-700">
-          <div className="text-xs text-gray-500 dark:text-gray-400">
-            已回收
-          </div>
-          <div className="mt-1 text-lg font-semibold">
+        <div className="glass p-4 text-center">
+          <div className="text-xs text-muted">已回收</div>
+          <div className="mono-num mt-1 text-lg font-semibold">
             {fmtTWD(totalRecovered)}
           </div>
         </div>
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-sm font-semibold">買入批次</h2>
+        <h2 className="text-sm font-semibold text-accent">買入批次</h2>
         {lots.map((lot) => (
-          <div
-            key={lot.id}
-            className="flex flex-col gap-2 rounded-xl border border-gray-200 p-4 text-sm dark:border-gray-800"
-          >
+          <div key={lot.id} className="glass flex flex-col gap-2 p-4 text-sm">
             <div className="flex items-center justify-between">
               <span>
                 {lot.purchased_at}
                 {lot.channel && (
-                  <span className="text-gray-500 dark:text-gray-400">
-                    ・{lot.channel}
-                  </span>
+                  <span className="text-muted">・{lot.channel}</span>
                 )}
               </span>
-              <span className="font-semibold">
+              <span className="mono-num font-semibold">
                 {fmtMoney(Number(lot.price), lot.currency)}
               </span>
             </div>
-            <div className="text-xs text-gray-500 dark:text-gray-400">
+            <div className="text-xs text-muted">
               數量 {lot.quantity}・剩 {lotRemaining(lot)}
               {Number(lot.fees) > 0 &&
                 `・費用 ${fmtMoney(Number(lot.fees), lot.currency)}`}
@@ -166,18 +152,18 @@ export default async function ItemDetailPage({
             </div>
 
             {(lot.sales ?? []).length > 0 && (
-              <div className="mt-1 flex flex-col gap-1.5 border-t border-gray-100 pt-2 dark:border-gray-800">
+              <div className="mt-1 flex flex-col gap-1.5 border-t border-border pt-2">
                 {lot.sales.map((sale) => (
                   <div
                     key={sale.id}
                     className="flex items-center justify-between text-xs"
                   >
-                    <span className="text-gray-500 dark:text-gray-400">
+                    <span className="text-muted">
                       {sale.sold_at} 賣出 {sale.quantity} 個
                       {sale.buyer_note && `・${sale.buyer_note}`}
                     </span>
                     <span className="flex items-center gap-2">
-                      <span>{fmtTWD(saleNetTWD(sale))}</span>
+                      <span className="mono-num">{fmtTWD(saleNetTWD(sale))}</span>
                       <DeleteButton
                         label="刪除"
                         confirmText="確定刪除這筆賣出紀錄？"

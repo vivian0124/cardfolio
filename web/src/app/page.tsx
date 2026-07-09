@@ -20,8 +20,10 @@ export default async function Home() {
   if (!configured) {
     return (
       <main className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
-        <h1 className="text-4xl font-bold tracking-tight">CardFolio</h1>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+        <h1 className="text-4xl font-bold tracking-tight text-accent">
+          CardFolio
+        </h1>
+        <p className="text-sm text-muted">
           尚未設定 Supabase 環境變數，請參考 docs/setup.md 完成設定
         </p>
       </main>
@@ -87,11 +89,13 @@ export default async function Home() {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col gap-6 px-4 pb-24 pt-8">
       <header className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight">CardFolio</h1>
+        <h1 className="text-2xl font-bold tracking-tight text-accent">
+          CardFolio
+        </h1>
         <form action="/auth/signout" method="post">
           <button
             type="submit"
-            className="text-sm text-gray-500 underline-offset-4 hover:underline dark:text-gray-400"
+            className="text-sm text-muted underline-offset-4 hover:underline"
           >
             登出
           </button>
@@ -111,7 +115,7 @@ export default async function Home() {
 
       <Link
         href="/purchases/new"
-        className="rounded-full bg-foreground py-3 text-center text-sm font-medium text-background"
+        className="btn-accent py-3 text-center text-sm"
       >
         ＋ 記一筆買入
       </Link>

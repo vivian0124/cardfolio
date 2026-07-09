@@ -47,7 +47,7 @@ export default async function ItemsPage() {
       <Link
         key={item.id}
         href={`/items/${item.id}`}
-        className="flex items-center justify-between gap-3 rounded-xl border border-gray-200 p-3 dark:border-gray-800"
+        className="glass glass-hover flex items-center justify-between gap-3 p-3"
       >
         {card?.image_url ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -58,7 +58,7 @@ export default async function ItemsPage() {
             className="h-14 w-10 shrink-0 rounded object-cover"
           />
         ) : (
-          <span className="flex h-14 w-10 shrink-0 items-center justify-center rounded bg-gray-100 text-base dark:bg-gray-800">
+          <span className="flex h-14 w-10 shrink-0 items-center justify-center rounded bg-white/5 text-base">
             {item.item_type === "sealed" ? "📦" : "🃏"}
           </span>
         )}
@@ -66,15 +66,15 @@ export default async function ItemsPage() {
           <div className="truncate text-sm font-medium">
             {item.custom_name}
           </div>
-          <div className="mt-0.5 flex flex-wrap gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+          <div className="mt-0.5 flex flex-wrap gap-1.5 text-xs text-muted">
             <span>{item.item_type === "card" ? "單卡" : "密封品"}</span>
             {item.condition && <span>・{item.condition}</span>}
             {item.grading && <span>・{item.grading}</span>}
           </div>
         </div>
         <div className="shrink-0 text-right">
-          <div className="text-sm font-semibold">{fmtTWD(cost)}</div>
-          <div className="text-xs text-gray-500 dark:text-gray-400">
+          <div className="mono-num text-sm font-semibold">{fmtTWD(cost)}</div>
+          <div className="text-xs text-muted">
             {item.status === "sold" ? "已售出" : `持有 ${remaining}`}
           </div>
         </div>
@@ -85,19 +85,19 @@ export default async function ItemsPage() {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col gap-4 px-4 pb-24 pt-8">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">庫存</h1>
+        <h1 className="text-xl font-bold text-accent">庫存</h1>
         <a
           href="/api/export"
-          className="text-sm text-gray-500 underline-offset-4 hover:underline dark:text-gray-400"
+          className="text-sm text-muted underline-offset-4 hover:underline"
         >
           匯出 CSV
         </a>
       </div>
 
       {items.length === 0 && (
-        <p className="py-16 text-center text-sm text-gray-500 dark:text-gray-400">
+        <p className="py-16 text-center text-sm text-muted">
           還沒有任何紀錄，先去
-          <Link href="/purchases/new" className="underline underline-offset-4">
+          <Link href="/purchases/new" className="text-accent underline underline-offset-4">
             記一筆買入
           </Link>
         </p>
@@ -105,7 +105,7 @@ export default async function ItemsPage() {
 
       {holding.length > 0 && (
         <section className="flex flex-col gap-2">
-          <h2 className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+          <h2 className="text-xs font-semibold text-muted">
             持有中（{holding.length}）
           </h2>
           {holding.map(renderItem)}
@@ -114,7 +114,7 @@ export default async function ItemsPage() {
 
       {sold.length > 0 && (
         <section className="mt-2 flex flex-col gap-2">
-          <h2 className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+          <h2 className="text-xs font-semibold text-muted">
             已售出（{sold.length}）
           </h2>
           {sold.map(renderItem)}

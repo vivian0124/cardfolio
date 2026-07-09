@@ -1,26 +1,175 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #070b0a;
+  --foreground: #e8fbf3;
+  --surface: rgba(255, 255, 255, 0.035);
+  --surface-strong: rgba(255, 255, 255, 0.06);
+  --border: rgba(94, 234, 212, 0.16);
+  --border-strong: rgba(94, 234, 212, 0.4);
+  --accent: #5eead4;
+  --accent-2: #22d3ee;
+  --muted: #6b8a80;
+  --glow: rgba(94, 234, 212, 0.35);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-surface: var(--surface);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  border-color: var(--border);
+}
+
+html {
+  color-scheme: dark;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  background-image:
+    radial-gradient(ellipse 900px 500px at 50% -8%, rgba(94, 234, 212, 0.1), transparent 60%),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(94, 234, 212, 0.025) 0px,
+      rgba(94, 234, 212, 0.025) 1px,
+      transparent 1px,
+      transparent 28px
+    );
+  background-attachment: fixed;
+}
+
+::selection {
+  background: var(--glow);
+  color: #04211b;
+}
+
+/* 玻璃卡片 */
+.glass {
+  background: linear-gradient(160deg, var(--surface-strong), var(--surface));
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+a.glass,
+button.glass,
+.glass-hover {
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+a.glass:hover,
+button.glass:hover,
+.glass-hover:hover {
+  border-color: var(--border-strong);
+  box-shadow: 0 0 20px -6px var(--glow);
+}
+
+.glass-owned {
+  border-color: var(--border-strong);
+  box-shadow: 0 0 14px -6px var(--glow);
+}
+
+/* 主要 CTA：實心霓虹 */
+.btn-accent {
+  background: linear-gradient(135deg, var(--accent), var(--accent-2));
+  color: #04211b;
+  border-radius: 999px;
+  font-weight: 600;
+  box-shadow: 0 0 24px -6px var(--glow);
+  transition: filter 0.15s ease, transform 0.1s ease;
+}
+
+.btn-accent:hover {
+  filter: brightness(1.08);
+}
+
+.btn-accent:active {
+  transform: scale(0.98);
+}
+
+.btn-accent:disabled {
+  opacity: 0.5;
+  filter: none;
+}
+
+/* 次要按鈕：玻璃描邊 */
+.btn-ghost {
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.btn-ghost:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-strong);
+}
+
+/* 表單欄位 */
+.field {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.02);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  color: var(--foreground);
+  transition: border-color 0.15s ease;
+}
+
+.field:focus {
+  outline: none;
+  border-color: var(--border-strong);
+  box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.12);
+}
+
+.field:disabled {
+  opacity: 0.5;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+/* 資料數字：終端機 mono */
+.mono-num {
+  font-family: var(--font-mono);
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.text-muted {
+  color: var(--muted);
+}
+
+/* 進度條 */
+.progress-track {
+  height: 6px;
+  width: 100%;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  box-shadow: 0 0 8px var(--glow);
 }

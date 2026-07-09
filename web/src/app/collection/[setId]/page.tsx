@@ -59,12 +59,12 @@ export default async function SetPage({
       <div>
         <Link
           href={`/collection?game=${set.game_id}&lang=${set.language}`}
-          className="text-xs text-gray-500 dark:text-gray-400"
+          className="text-xs text-muted"
         >
           ← 圖鑑
         </Link>
         <h1 className="mt-1 text-lg font-bold">{set.name}</h1>
-        <p className="text-xs text-gray-500 dark:text-gray-400">
+        <p className="mono-num text-xs text-muted">
           {set.code}・已收集 {owned.size} / {cards.length}
         </p>
       </div>
@@ -73,10 +73,8 @@ export default async function SetPage({
         {cards.map((c) => (
           <div
             key={c.id}
-            className={`flex flex-col gap-1 rounded-lg border p-1.5 ${
-              owned.has(c.id)
-                ? "border-green-500"
-                : "border-gray-200 dark:border-gray-800"
+            className={`glass flex flex-col gap-1 p-1.5 ${
+              owned.has(c.id) ? "glass-owned" : ""
             }`}
           >
             {c.image_url ? (
@@ -88,22 +86,22 @@ export default async function SetPage({
                 className="aspect-[5/7] w-full rounded object-cover"
               />
             ) : (
-              <div className="flex aspect-[5/7] w-full items-center justify-center rounded bg-gray-100 p-1 text-center text-xs text-gray-500 dark:bg-gray-800 dark:text-gray-400">
+              <div className="flex aspect-[5/7] w-full items-center justify-center rounded bg-white/5 p-1 text-center text-xs text-muted">
                 {c.name}
               </div>
             )}
-            <div className="flex items-center justify-between px-0.5 text-xs text-gray-500 dark:text-gray-400">
+            <div className="flex items-center justify-between px-0.5 text-xs text-muted">
               <span className="truncate">
                 {c.card_no}
                 {c.rarity && `・${c.rarity}`}
               </span>
-              {owned.has(c.id) && <span className="text-green-500">✓</span>}
+              {owned.has(c.id) && <span className="text-accent">✓</span>}
             </div>
             <div className="flex items-center justify-between px-0.5">
               <WishlistButton cardId={c.id} initialIn={wished.has(c.id)} />
               <Link
                 href={`/purchases/new?card=${c.id}`}
-                className="rounded-full border border-gray-300 px-2 py-0.5 text-xs text-gray-600 dark:border-gray-700 dark:text-gray-300"
+                className="btn-ghost px-2 py-0.5 text-xs text-muted"
               >
                 ＋買入
               </Link>

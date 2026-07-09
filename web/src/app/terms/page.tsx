@@ -3,10 +3,8 @@ export const metadata = { title: "服務條款 - CardFolio" };
 export default function TermsPage() {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col gap-4 px-4 py-10 text-sm leading-relaxed">
-      <h1 className="text-xl font-bold">服務條款</h1>
-      <p className="text-xs text-gray-500 dark:text-gray-400">
-        最後更新：2026-07-10
-      </p>
+      <h1 className="text-xl font-bold text-accent">服務條款</h1>
+      <p className="text-xs text-muted">最後更新：2026-07-10</p>
 
       <p>
         CardFolio 是個人開發、非營利的卡牌投資記帳工具，目前為早期開發階段。使用本服務即表示你同意以下條款。

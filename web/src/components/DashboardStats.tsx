@@ -61,17 +61,13 @@ export default function DashboardStats({
   };
 
   const pnlColor = (v: number) =>
-    v > 0
-      ? "text-green-600 dark:text-green-400"
-      : v < 0
-        ? "text-red-600 dark:text-red-400"
-        : "";
+    v > 0 ? "text-green-400" : v < 0 ? "text-red-400" : "";
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-2">
         <select
-          className="rounded-lg border border-gray-300 bg-transparent px-2 py-1 text-xs dark:border-gray-700"
+          className="field w-auto py-1 text-xs"
           value={currency}
           onChange={(e) => setCurrency(e.target.value as Currency)}
         >
@@ -82,12 +78,12 @@ export default function DashboardStats({
           ))}
         </select>
         {currency !== "TWD" && (
-          <label className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
+          <label className="flex items-center gap-1 text-xs text-muted">
             1 {currency} =
             <input
               type="number"
               step="0.0001"
-              className="w-20 rounded border border-gray-300 bg-transparent px-1.5 py-1 dark:border-gray-700"
+              className="field w-20 py-1"
               value={rates[currency]}
               onChange={(e) =>
                 setRates((r) => ({ ...r, [currency]: Number(e.target.value) }))
@@ -113,34 +109,26 @@ export default function DashboardStats({
             color: roi === null ? "" : pnlColor(roi),
           },
         ].map((stat) => (
-          <div
-            key={stat.label}
-            className="rounded-xl border border-gray-200 p-3 text-center dark:border-gray-700"
-          >
-            <div className="text-xs text-gray-500 dark:text-gray-400">
-              {stat.label}
-            </div>
-            <div className={`mt-1 text-base font-semibold ${stat.color}`}>
+          <div key={stat.label} className="glass p-3 text-center">
+            <div className="text-xs text-muted">{stat.label}</div>
+            <div className={`mono-num mt-1 text-base font-semibold ${stat.color}`}>
               {stat.value}
             </div>
           </div>
         ))}
       </section>
 
-      <section className="flex flex-col gap-2 rounded-xl border border-gray-200 p-4 dark:border-gray-700">
+      <section className="glass flex flex-col gap-2 p-4">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-500 dark:text-gray-400">在庫成本</span>
-          <span className="font-semibold">{fmt(inventoryCost)}</span>
+          <span className="text-muted">在庫成本</span>
+          <span className="mono-num font-semibold">{fmt(inventoryCost)}</span>
         </div>
         <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-500 dark:text-gray-400">
-            未實現損益
-            <span className="ml-1 text-gray-400 dark:text-gray-500">
-              (手動市價)
-            </span>
+          <span className="text-muted">
+            未實現損益<span className="ml-1">(手動市價)</span>
           </span>
           <span
-            className={`font-semibold ${unrealizedPnl === null ? "" : pnlColor(unrealizedPnl)}`}
+            className={`mono-num font-semibold ${unrealizedPnl === null ? "" : pnlColor(unrealizedPnl)}`}
           >
             {unrealizedPnl === null ? "—" : fmt(unrealizedPnl)}
           </span>
@@ -149,13 +137,13 @@ export default function DashboardStats({
 
       {(topGainers.length > 0 || topLosers.length > 0) && (
         <section className="grid grid-cols-2 gap-3">
-          <div className="rounded-xl border border-gray-200 p-3 dark:border-gray-700">
-            <div className="mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400">
+          <div className="glass p-3">
+            <div className="mb-2 text-xs font-semibold text-muted">
               賺最多
             </div>
             <div className="flex flex-col gap-1.5">
               {topGainers.length === 0 && (
-                <span className="text-xs text-gray-400">—</span>
+                <span className="text-xs text-muted">—</span>
               )}
               {topGainers.map((r) => (
                 <Link
@@ -163,23 +151,21 @@ export default function DashboardStats({
                   href={`/items/${r.id}`}
                   className="flex items-center justify-between gap-2 text-xs"
                 >
-                  <span className="truncate text-gray-600 dark:text-gray-300">
-                    {r.name}
-                  </span>
-                  <span className="shrink-0 text-green-600 dark:text-green-400">
+                  <span className="truncate">{r.name}</span>
+                  <span className="mono-num shrink-0 text-green-400">
                     {fmt(r.pnl)}
                   </span>
                 </Link>
               ))}
             </div>
           </div>
-          <div className="rounded-xl border border-gray-200 p-3 dark:border-gray-700">
-            <div className="mb-2 text-xs font-semibold text-gray-500 dark:text-gray-400">
+          <div className="glass p-3">
+            <div className="mb-2 text-xs font-semibold text-muted">
               賠最多
             </div>
             <div className="flex flex-col gap-1.5">
               {topLosers.length === 0 && (
-                <span className="text-xs text-gray-400">—</span>
+                <span className="text-xs text-muted">—</span>
               )}
               {topLosers.map((r) => (
                 <Link
@@ -187,10 +173,8 @@ export default function DashboardStats({
                   href={`/items/${r.id}`}
                   className="flex items-center justify-between gap-2 text-xs"
                 >
-                  <span className="truncate text-gray-600 dark:text-gray-300">
-                    {r.name}
-                  </span>
-                  <span className="shrink-0 text-red-600 dark:text-red-400">
+                  <span className="truncate">{r.name}</span>
+                  <span className="mono-num shrink-0 text-red-400">
                     {fmt(r.pnl)}
                   </span>
                 </Link>

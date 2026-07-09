@@ -40,14 +40,14 @@ function LoginContent() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-8 px-6">
       <div className="text-center">
-        <h1 className="text-4xl font-bold tracking-tight">CardFolio</h1>
-        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-          卡牌投資記帳・收藏圖鑑
-        </p>
+        <h1 className="mono-num text-4xl font-bold tracking-tight text-accent">
+          CardFolio
+        </h1>
+        <p className="mt-2 text-sm text-muted">卡牌投資記帳・收藏圖鑑</p>
       </div>
 
       {authError && (
-        <p className="rounded-md bg-red-50 px-4 py-2 text-sm text-red-600 dark:bg-red-950 dark:text-red-400">
+        <p className="glass rounded-md px-4 py-2 text-sm text-red-400">
           登入發生問題，請再試一次
         </p>
       )}
@@ -55,7 +55,7 @@ function LoginContent() {
       <button
         onClick={signInWithGoogle}
         disabled={loading !== null}
-        className="flex items-center gap-3 rounded-full border border-gray-300 bg-white px-6 py-3 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+        className="glass glass-hover flex items-center gap-3 px-6 py-3 text-sm font-medium disabled:opacity-50"
       >
         <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden>
           <path
@@ -82,21 +82,21 @@ function LoginContent() {
         <button
           onClick={signInAsGuest}
           disabled={loading !== null}
-          className="text-sm text-gray-500 underline underline-offset-4 disabled:opacity-50 dark:text-gray-400"
+          className="text-sm text-accent underline underline-offset-4 disabled:opacity-50"
         >
           {loading === "guest" ? "進入中…" : "以訪客身分試用"}
         </button>
-        <p className="text-xs text-gray-400 dark:text-gray-500">
+        <p className="text-xs text-muted">
           訪客資料只存在這個瀏覽器，清除瀏覽資料或換裝置就找不回來
         </p>
         {guestError && (
-          <p className="rounded-md bg-red-50 px-4 py-2 text-xs text-red-600 dark:bg-red-950 dark:text-red-400">
+          <p className="glass rounded-md px-4 py-2 text-xs text-red-400">
             {guestError}
           </p>
         )}
       </div>
 
-      <div className="flex gap-3 text-xs text-gray-400 dark:text-gray-500">
+      <div className="flex gap-3 text-xs text-muted">
         <Link href="/privacy" className="underline underline-offset-4">
           隱私權政策
         </Link>

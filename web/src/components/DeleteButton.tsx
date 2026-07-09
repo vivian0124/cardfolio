@@ -37,7 +37,7 @@ export default function DeleteButton({
       type="button"
       disabled={busy}
       onClick={onClick}
-      className="text-xs text-red-500 disabled:opacity-50"
+      className="text-xs text-red-400 disabled:opacity-50"
     >
       {label}
     </button>

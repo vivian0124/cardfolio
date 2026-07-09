@@ -76,7 +76,7 @@ export default function CardSearchInput({
     <div className="relative" ref={boxRef}>
       <input
         type="text"
-        className="w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm focus:border-gray-500 focus:outline-none dark:border-gray-700"
+        className="field"
         placeholder={placeholder}
         value={value}
         onChange={(e) => {
@@ -87,21 +87,19 @@ export default function CardSearchInput({
         onFocus={() => hits.length > 0 && setOpen(true)}
       />
       {cardId && (
-        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-green-600 dark:text-green-400">
+        <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-green-400">
           已選卡 ✓
         </span>
       )}
 
       {open && (hits.length > 0 || searching) && (
-        <ul className="absolute z-20 mt-1 max-h-72 w-full overflow-auto rounded-lg border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-900">
-          {searching && (
-            <li className="px-3 py-2 text-xs text-gray-400">搜尋中…</li>
-          )}
+        <ul className="glass absolute z-20 mt-1 max-h-72 w-full overflow-auto">
+          {searching && <li className="px-3 py-2 text-xs text-muted">搜尋中…</li>}
           {hits.map((h) => (
             <li key={h.id}>
               <button
                 type="button"
-                className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-gray-800"
+                className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-white/5"
                 onClick={() => {
                   onChange(h.name, h.id);
                   setOpen(false);
@@ -116,11 +114,11 @@ export default function CardSearchInput({
                     loading="lazy"
                   />
                 ) : (
-                  <span className="h-12 w-9 shrink-0 rounded bg-gray-100 dark:bg-gray-800" />
+                  <span className="h-12 w-9 shrink-0 rounded bg-white/5" />
                 )}
                 <span className="min-w-0">
                   <span className="block truncate text-sm">{h.name}</span>
-                  <span className="block text-xs text-gray-500 dark:text-gray-400">
+                  <span className="block text-xs text-muted">
                     {h.set.code}・{h.card_no}・
                     {LANG_LABEL[h.set.language] ?? h.set.language}
                   </span>

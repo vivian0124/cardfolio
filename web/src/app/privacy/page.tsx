@@ -3,10 +3,8 @@ export const metadata = { title: "隱私權政策 - CardFolio" };
 export default function PrivacyPage() {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col gap-4 px-4 py-10 text-sm leading-relaxed">
-      <h1 className="text-xl font-bold">隱私權政策</h1>
-      <p className="text-xs text-gray-500 dark:text-gray-400">
-        最後更新：2026-07-10
-      </p>
+      <h1 className="text-xl font-bold text-accent">隱私權政策</h1>
+      <p className="text-xs text-muted">最後更新：2026-07-10</p>
 
       <p>
         CardFolio 是一個個人卡牌投資記帳與收藏圖鑑工具。這份文件說明我們收集哪些資料、如何使用，以及你的權利。

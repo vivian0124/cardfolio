@@ -37,17 +37,14 @@ export default async function WishlistPage() {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col gap-4 px-4 pb-24 pt-8">
       <div>
-        <Link
-          href="/collection"
-          className="text-xs text-gray-500 dark:text-gray-400"
-        >
+        <Link href="/collection" className="text-xs text-muted">
           ← 圖鑑
         </Link>
-        <h1 className="mt-1 text-xl font-bold">願望清單</h1>
+        <h1 className="mt-1 text-xl font-bold text-accent">願望清單</h1>
       </div>
 
       {rows.length === 0 && (
-        <p className="py-16 text-center text-sm text-gray-500 dark:text-gray-400">
+        <p className="py-16 text-center text-sm text-muted">
           還沒有想收的卡，去圖鑑點 🤍 加進來
         </p>
       )}
@@ -60,10 +57,7 @@ export default async function WishlistPage() {
             ? card.card_sets[0]
             : card.card_sets;
           return (
-            <div
-              key={w.id}
-              className="flex items-center gap-3 rounded-xl border border-gray-200 p-3 dark:border-gray-800"
-            >
+            <div key={w.id} className="glass flex items-center gap-3 p-3">
               {card.image_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -73,18 +67,18 @@ export default async function WishlistPage() {
                   className="h-16 w-12 shrink-0 rounded object-cover"
                 />
               ) : (
-                <span className="h-16 w-12 shrink-0 rounded bg-gray-100 dark:bg-gray-800" />
+                <span className="h-16 w-12 shrink-0 rounded bg-white/5" />
               )}
               <div className="min-w-0 flex-1">
                 <div className="truncate text-sm font-medium">{card.name}</div>
-                <div className="text-xs text-gray-500 dark:text-gray-400">
+                <div className="text-xs text-muted">
                   {set?.code}・{card.card_no}
                 </div>
               </div>
               <div className="flex shrink-0 items-center gap-3">
                 <Link
                   href={`/purchases/new?card=${card.id}`}
-                  className="rounded-full border border-gray-300 px-3 py-1 text-xs text-gray-600 dark:border-gray-700 dark:text-gray-300"
+                  className="btn-ghost px-3 py-1 text-xs text-muted"
                 >
                   ＋買入
                 </Link>

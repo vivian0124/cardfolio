@@ -11,9 +11,8 @@ export type SellableLot = {
   remaining: number;
 };
 
-const inputCls =
-  "w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm focus:border-gray-500 focus:outline-none dark:border-gray-700";
-const labelCls = "block text-xs text-gray-500 dark:text-gray-400 mb-1";
+const inputCls = "field";
+const labelCls = "field-label";
 
 export default function SellForm({
   itemId,
@@ -69,8 +68,8 @@ export default function SellForm({
   };
 
   return (
-    <div className="flex flex-col gap-3 rounded-xl border border-gray-200 p-4 dark:border-gray-800">
-      <h2 className="text-sm font-semibold">記一筆賣出</h2>
+    <div className="glass flex flex-col gap-3 p-4">
+      <h2 className="text-sm font-semibold text-accent">記一筆賣出</h2>
 
       <div>
         <label className={labelCls}>從哪個批次賣</label>
@@ -171,7 +170,7 @@ export default function SellForm({
       </div>
 
       {error && (
-        <p className="rounded-md bg-red-50 px-4 py-2 text-sm text-red-600 dark:bg-red-950 dark:text-red-400">
+        <p className="glass rounded-md px-4 py-2 text-sm text-red-400">
           {error}
         </p>
       )}
@@ -180,7 +179,7 @@ export default function SellForm({
         type="button"
         disabled={submitting}
         onClick={submit}
-        className="rounded-full bg-foreground py-2.5 text-sm font-medium text-background disabled:opacity-50"
+        className="btn-accent py-2.5 text-sm disabled:opacity-50"
       >
         {submitting ? "儲存中…" : "儲存賣出"}
       </button>
