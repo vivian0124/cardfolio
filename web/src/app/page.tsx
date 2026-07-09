@@ -2,8 +2,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import BottomNav from "@/components/BottomNav";
-import { fmtTWD } from "@/lib/format";
-import { computeStats, type LotNumbers } from "@/lib/stats";
+import DashboardStats from "@/components/DashboardStats";
+import { computeStats, realizedRoi, type LotNumbers } from "@/lib/stats";
 
 export const dynamic = "force-dynamic";
 
@@ -36,12 +36,32 @@ export default async function Home() {
       "quantity, price, fees, exchange_rate, sales(quantity, price, fees, exchange_rate)"
     );
   const stats = computeStats((lotsData ?? []) as LotNumbers[]);
-  const pnlColor =
-    stats.realizedPnl > 0
-      ? "text-green-600 dark:text-green-400"
-      : stats.realizedPnl < 0
-        ? "text-red-600 dark:text-red-400"
-        : "";
+  const roi = realizedRoi(stats);
+
+  // 單卡損益排行：逐項目算已實現損益，篩出有實際交易的項目
+  const { data: itemsData } = await supabase.from("inventory_items").select(
+    "id, custom_name, purchase_lots(quantity, price, fees, exchange_rate, sales(quantity, price, fees, exchange_rate))"
+  );
+  type RankItem = {
+    id: string;
+    custom_name: string | null;
+    purchase_lots: LotNumbers[];
+  };
+  const ranked = ((itemsData ?? []) as RankItem[])
+    .map((item) => ({
+      id: item.id,
+      name: item.custom_name ?? "未命名",
+      pnl: computeStats(item.purchase_lots).realizedPnl,
+    }))
+    .filter((r) => r.pnl !== 0);
+  const topGainers = [...ranked]
+    .filter((r) => r.pnl > 0)
+    .sort((a, b) => b.pnl - a.pnl)
+    .slice(0, 5);
+  const topLosers = [...ranked]
+    .filter((r) => r.pnl < 0)
+    .sort((a, b) => a.pnl - b.pnl)
+    .slice(0, 5);
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col gap-6 px-4 pb-24 pt-8">
@@ -57,36 +77,15 @@ export default async function Home() {
         </form>
       </header>
 
-      <section className="grid grid-cols-3 gap-3">
-        {[
-          { label: "總投入", value: fmtTWD(stats.invested), color: "" },
-          { label: "總回收", value: fmtTWD(stats.recovered), color: "" },
-          {
-            label: "已實現損益",
-            value: fmtTWD(stats.realizedPnl),
-            color: pnlColor,
-          },
-        ].map((stat) => (
-          <div
-            key={stat.label}
-            className="rounded-xl border border-gray-200 p-3 text-center dark:border-gray-700"
-          >
-            <div className="text-xs text-gray-500 dark:text-gray-400">
-              {stat.label}
-            </div>
-            <div className={`mt-1 text-base font-semibold ${stat.color}`}>
-              {stat.value}
-            </div>
-          </div>
-        ))}
-      </section>
-
-      <section className="rounded-xl border border-gray-200 p-4 dark:border-gray-700">
-        <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-500 dark:text-gray-400">在庫成本</span>
-          <span className="font-semibold">{fmtTWD(stats.inventoryCost)}</span>
-        </div>
-      </section>
+      <DashboardStats
+        invested={stats.invested}
+        recovered={stats.recovered}
+        realizedPnl={stats.realizedPnl}
+        inventoryCost={stats.inventoryCost}
+        roi={roi}
+        topGainers={topGainers}
+        topLosers={topLosers}
+      />
 
       <Link
         href="/purchases/new"

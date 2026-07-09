@@ -39,6 +39,7 @@ export type PortfolioStats = {
   recovered: number; // 總回收（台幣）
   realizedPnl: number; // 已實現損益（台幣）
   inventoryCost: number; // 在庫成本（台幣）
+  soldCost: number; // 已賣出部分的成本（台幣），算已實現 ROI 用
 };
 
 export function computeStats(lots: LotNumbers[]): PortfolioStats {
@@ -64,5 +65,11 @@ export function computeStats(lots: LotNumbers[]): PortfolioStats {
     recovered,
     realizedPnl,
     inventoryCost: invested - soldCost,
+    soldCost,
   };
+}
+
+/** 已實現 ROI（賣出淨額相對於賣出部分成本的報酬率），沒有已實現交易時回傳 null */
+export function realizedRoi(stats: PortfolioStats): number | null {
+  return stats.soldCost > 0 ? stats.realizedPnl / stats.soldCost : null;
 }

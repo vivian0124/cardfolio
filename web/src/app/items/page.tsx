@@ -84,7 +84,15 @@ export default async function ItemsPage() {
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col gap-4 px-4 pb-24 pt-8">
-      <h1 className="text-xl font-bold">庫存</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-bold">庫存</h1>
+        <a
+          href="/api/export"
+          className="text-sm text-gray-500 underline-offset-4 hover:underline dark:text-gray-400"
+        >
+          匯出 CSV
+        </a>
+      </div>
 
       {items.length === 0 && (
         <p className="py-16 text-center text-sm text-gray-500 dark:text-gray-400">
