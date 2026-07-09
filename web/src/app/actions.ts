@@ -12,6 +12,7 @@ export type PurchaseShared = {
 
 export type PurchaseRow = {
   name: string;
+  cardId: string | null; // 從目錄選卡時帶入，自由文字則為 null
   itemType: "card" | "sealed";
   quantity: number;
   price: number;
@@ -57,6 +58,7 @@ export async function createPurchases(
       .from("inventory_items")
       .insert({
         item_type: row.itemType,
+        card_id: row.itemType === "card" ? row.cardId : null,
         custom_name: row.name.trim(),
         condition: row.condition || null,
         grading: row.grading.trim() || null,
@@ -168,6 +170,34 @@ export async function deleteSale(
   revalidatePath("/");
   revalidatePath("/items");
   revalidatePath(`/items/${itemId}`);
+  return { error: null };
+}
+
+export async function toggleWishlist(cardId: string): Promise<ActionResult> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { error: "請先登入" };
+
+  const { data: existing } = await supabase
+    .from("wishlist")
+    .select("id")
+    .eq("card_id", cardId)
+    .maybeSingle();
+
+  if (existing) {
+    const { error } = await supabase
+      .from("wishlist")
+      .delete()
+      .eq("id", existing.id);
+    if (error) return { error: error.message };
+  } else {
+    const { error } = await supabase.from("wishlist").insert({ card_id: cardId });
+    if (error) return { error: error.message };
+  }
+
+  revalidatePath("/wishlist");
   return { error: null };
 }
 

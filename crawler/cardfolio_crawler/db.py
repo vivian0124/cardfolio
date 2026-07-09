@@ -47,6 +47,29 @@ class SupabaseWriter:
             written += len(batch)
         return written
 
+    def existing_external_ids(self, prefix: str) -> set[str]:
+        """已入庫卡片的 external_id（增量同步用），用 offset 分頁撈完。"""
+        ids: set[str] = set()
+        offset = 0
+        while True:
+            resp = requests.get(
+                f"{self.rest}/cards",
+                params={
+                    "select": "external_id",
+                    "external_id": f"like.{prefix}%",
+                    "limit": "1000",
+                    "offset": str(offset),
+                },
+                headers=self.headers,
+                timeout=60,
+            )
+            resp.raise_for_status()
+            rows = resp.json()
+            ids.update(r["external_id"] for r in rows if r["external_id"])
+            if len(rows) < 1000:
+                return ids
+            offset += 1000
+
     def set_id_map(self, game_id: str, language: str) -> dict[str, str]:
         """取 card_sets 的 code -> id 對照（寫 cards 時要換成 set_id）。"""
         resp = requests.get(

@@ -8,11 +8,13 @@ import {
   type PurchaseShared,
 } from "@/app/actions";
 import { CURRENCIES, CONDITIONS } from "@/lib/format";
+import CardSearchInput from "@/components/CardSearchInput";
 
 const DEFAULTS_KEY = "cardfolio:purchase-defaults";
 
 const emptyRow = (): PurchaseRow => ({
   name: "",
+  cardId: null,
   itemType: "card",
   quantity: 1,
   price: 0,
@@ -26,7 +28,11 @@ const inputCls =
   "w-full rounded-lg border border-gray-300 bg-transparent px-3 py-2 text-sm focus:border-gray-500 focus:outline-none dark:border-gray-700";
 const labelCls = "block text-xs text-gray-500 dark:text-gray-400 mb-1";
 
-export default function PurchaseForm() {
+export default function PurchaseForm({
+  initialCard,
+}: {
+  initialCard?: { id: string; name: string } | null;
+}) {
   const router = useRouter();
   const [shared, setShared] = useState<PurchaseShared>({
     purchasedAt: new Date().toISOString().slice(0, 10),
@@ -34,7 +40,11 @@ export default function PurchaseForm() {
     currency: "TWD",
     exchangeRate: 1,
   });
-  const [rows, setRows] = useState<PurchaseRow[]>([emptyRow()]);
+  const [rows, setRows] = useState<PurchaseRow[]>([
+    initialCard
+      ? { ...emptyRow(), name: initialCard.name, cardId: initialCard.id }
+      : emptyRow(),
+  ]);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -169,13 +179,22 @@ export default function PurchaseForm() {
 
           <div>
             <label className={labelCls}>名稱</label>
-            <input
-              type="text"
-              className={inputCls}
-              placeholder="卡名或商品名（例：噴火龍 ex SAR / 151 禮盒）"
-              value={row.name}
-              onChange={(e) => setRow(i, { name: e.target.value })}
-            />
+            {row.itemType === "card" ? (
+              <CardSearchInput
+                value={row.name}
+                cardId={row.cardId}
+                placeholder="打卡名搜尋目錄，或直接自由輸入"
+                onChange={(name, cardId) => setRow(i, { name, cardId })}
+              />
+            ) : (
+              <input
+                type="text"
+                className={inputCls}
+                placeholder="商品名（例：151 禮盒、OP-16 一箱）"
+                value={row.name}
+                onChange={(e) => setRow(i, { name: e.target.value })}
+              />
+            )}
           </div>
 
           <div className="grid grid-cols-3 gap-3">

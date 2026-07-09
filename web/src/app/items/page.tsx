@@ -14,6 +14,7 @@ type ItemRow = {
   condition: string | null;
   grading: string | null;
   status: string;
+  cards: { image_url: string | null } | { image_url: string | null }[] | null;
   purchase_lots: LotNumbers[];
 };
 
@@ -27,7 +28,7 @@ export default async function ItemsPage() {
   const { data } = await supabase
     .from("inventory_items")
     .select(
-      "id, item_type, custom_name, condition, grading, status, purchase_lots(quantity, price, fees, exchange_rate, sales(quantity, price, fees, exchange_rate))"
+      "id, item_type, custom_name, condition, grading, status, cards(image_url), purchase_lots(quantity, price, fees, exchange_rate, sales(quantity, price, fees, exchange_rate))"
     )
     .order("created_at", { ascending: false });
 
@@ -41,13 +42,27 @@ export default async function ItemsPage() {
       0
     );
     const cost = item.purchase_lots.reduce((sum, l) => sum + lotCostTWD(l), 0);
+    const card = Array.isArray(item.cards) ? item.cards[0] : item.cards;
     return (
       <Link
         key={item.id}
         href={`/items/${item.id}`}
-        className="flex items-center justify-between gap-3 rounded-xl border border-gray-200 p-4 dark:border-gray-800"
+        className="flex items-center justify-between gap-3 rounded-xl border border-gray-200 p-3 dark:border-gray-800"
       >
-        <div className="min-w-0">
+        {card?.image_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={card.image_url}
+            alt=""
+            loading="lazy"
+            className="h-14 w-10 shrink-0 rounded object-cover"
+          />
+        ) : (
+          <span className="flex h-14 w-10 shrink-0 items-center justify-center rounded bg-gray-100 text-base dark:bg-gray-800">
+            {item.item_type === "sealed" ? "📦" : "🃏"}
+          </span>
+        )}
+        <div className="min-w-0 flex-1">
           <div className="truncate text-sm font-medium">
             {item.custom_name}
           </div>

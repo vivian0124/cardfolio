@@ -8,6 +8,7 @@
 | `ptcg-ja` | PTCG 日文，pokemon-card.com 內部搜尋 API 全卡掃描（約 2.3 萬張；卡號/稀有度待補完，`--limit-sets` 在此代表頁數） |
 | `opcg-en` | One Piece 英文，官方 en.onepiece-cardgame.com 卡表 |
 | `opcg-ja` | One Piece 日文，官方 onepiece-cardgame.com 卡表（與英文站共用解析） |
+| `ptcg-zh-tw` | PTCG 繁中，asia.pokemon-card.com/tw。卡名要進詳細頁，採**增量同步**：每次最多抓 `PTCG_TW_MAX_DETAILS`（預設 1500）張新卡，跑幾次自然補完 |
 
 > `ptcg-ja` 需要先執行 `supabase/migrations/0002_cards_external_id.sql`。
 
@@ -49,4 +50,6 @@ GitHub Actions（`.github/workflows/sync-catalog.yml`）每週六早上自動跑
 ## 之後的來源（Phase 2 後段）
 
 - `ptcg-ja` 補完：進單卡詳細頁補收藏編號（046/106 這種）與稀有度、商品名稱對應
-- 繁中版本：官網結構待調查
+- PTCG 簡中：官方資料庫主機在中國境內，從本機與 GitHub Actions 都連不上（timeout），
+  需要另找可達的資料來源或代理，暫緩
+- One Piece 繁中/簡中：官網結構待調查
