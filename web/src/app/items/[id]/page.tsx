@@ -7,6 +7,7 @@ import DeleteButton from "@/components/DeleteButton";
 import MarketPriceForm from "@/components/MarketPriceForm";
 import { deleteItem, deleteSale } from "@/app/actions";
 import { fmtMoney, fmtTWD } from "@/lib/format";
+import { yuyuTeiSearchUrl } from "@/lib/priceLinks";
 import {
   lotCostTWD,
   lotRemaining,
@@ -52,12 +53,23 @@ export default async function ItemDetailPage({
   const { data: item } = await supabase
     .from("inventory_items")
     .select(
-      "id, item_type, custom_name, condition, grading, status, note, market_price_twd, market_price_updated_at, purchase_lots(id, quantity, price, currency, exchange_rate, fees, channel, purchased_at, note, sales(id, quantity, price, currency, exchange_rate, fees, buyer_note, sold_at))"
+      "id, item_type, custom_name, condition, grading, status, note, market_price_twd, market_price_updated_at, cards(name, card_sets(game_id)), purchase_lots(id, quantity, price, currency, exchange_rate, fees, channel, purchased_at, note, sales(id, quantity, price, currency, exchange_rate, fees, buyer_note, sold_at))"
     )
     .eq("id", id)
     .single();
 
   if (!item) notFound();
+
+  const linkedCard = Array.isArray(item.cards) ? item.cards[0] : item.cards;
+  const linkedSet = linkedCard
+    ? Array.isArray(linkedCard.card_sets)
+      ? linkedCard.card_sets[0]
+      : linkedCard.card_sets
+    : null;
+  const priceSearchUrl =
+    linkedCard && linkedSet
+      ? yuyuTeiSearchUrl(linkedSet.game_id, linkedCard.name)
+      : null;
 
   const marketPrice =
     item.market_price_twd === null ? null : Number(item.market_price_twd);
@@ -185,6 +197,7 @@ export default async function ItemDetailPage({
         initialPrice={marketPrice}
         updatedAt={item.market_price_updated_at}
         unrealizedPnl={unrealizedPnl(lots, marketPrice)}
+        priceSearchUrl={priceSearchUrl}
       />
 
       <SellForm itemId={item.id} lots={sellableLots} />

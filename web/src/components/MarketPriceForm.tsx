@@ -10,11 +10,13 @@ export default function MarketPriceForm({
   initialPrice,
   updatedAt,
   unrealizedPnl,
+  priceSearchUrl,
 }: {
   itemId: string;
   initialPrice: number | null;
   updatedAt: string | null;
   unrealizedPnl: number | null;
+  priceSearchUrl?: string | null;
 }) {
   const router = useRouter();
   const [price, setPrice] = useState(initialPrice?.toString() ?? "");
@@ -45,7 +47,19 @@ export default function MarketPriceForm({
 
   return (
     <section className="flex flex-col gap-2 rounded-xl border border-gray-200 p-4 dark:border-gray-800">
-      <h2 className="text-sm font-semibold">目前市價（手動填寫）</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-sm font-semibold">目前市價（手動填寫）</h2>
+        {priceSearchUrl && (
+          <a
+            href={priceSearchUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-gray-500 underline underline-offset-4 dark:text-gray-400"
+          >
+            去 Yuyu-tei 查價 ↗
+          </a>
+        )}
+      </div>
       <div className="flex items-center gap-2">
         <input
           type="number"
