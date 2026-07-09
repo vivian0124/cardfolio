@@ -4,12 +4,14 @@ import { createClient } from "@/lib/supabase/server";
 import BottomNav from "@/components/BottomNav";
 import SellForm, { type SellableLot } from "@/components/SellForm";
 import DeleteButton from "@/components/DeleteButton";
+import MarketPriceForm from "@/components/MarketPriceForm";
 import { deleteItem, deleteSale } from "@/app/actions";
 import { fmtMoney, fmtTWD } from "@/lib/format";
 import {
   lotCostTWD,
   lotRemaining,
   saleNetTWD,
+  unrealizedPnl,
   type SaleNumbers,
 } from "@/lib/stats";
 
@@ -50,13 +52,15 @@ export default async function ItemDetailPage({
   const { data: item } = await supabase
     .from("inventory_items")
     .select(
-      "id, item_type, custom_name, condition, grading, status, note, purchase_lots(id, quantity, price, currency, exchange_rate, fees, channel, purchased_at, note, sales(id, quantity, price, currency, exchange_rate, fees, buyer_note, sold_at))"
+      "id, item_type, custom_name, condition, grading, status, note, market_price_twd, market_price_updated_at, purchase_lots(id, quantity, price, currency, exchange_rate, fees, channel, purchased_at, note, sales(id, quantity, price, currency, exchange_rate, fees, buyer_note, sold_at))"
     )
     .eq("id", id)
     .single();
 
   if (!item) notFound();
 
+  const marketPrice =
+    item.market_price_twd === null ? null : Number(item.market_price_twd);
   const lots = (item.purchase_lots ?? []) as LotRow[];
   const totalCost = lots.reduce((s, l) => s + lotCostTWD(l), 0);
   const totalRecovered = lots.reduce(
@@ -175,6 +179,13 @@ export default async function ItemDetailPage({
           </div>
         ))}
       </section>
+
+      <MarketPriceForm
+        itemId={item.id}
+        initialPrice={marketPrice}
+        updatedAt={item.market_price_updated_at}
+        unrealizedPnl={unrealizedPnl(lots, marketPrice)}
+      />
 
       <SellForm itemId={item.id} lots={sellableLots} />
 

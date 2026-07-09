@@ -49,6 +49,8 @@ cardfolio/
 - [ ] **Phase 2 — 卡牌目錄**：英文（API）→ 日文（爬蟲）→ 繁中（爬蟲），排程更新
 - [ ] **Phase 3 — 選卡整合＋收藏圖鑑**：搜尋選卡、卡圖、收集進度、願望清單
 - [ ] **Phase 4 — 儀表板＋匯出**：ROI、單卡損益排行、幣別切換、CSV 匯出
-- [ ] **Phase 5+**：市價追蹤與未實現損益、多人開放
+- [x] **Phase 5a**：手動市價欄位＋未實現損益
+- [ ] **Phase 5b**：自動市價爬蟲
+- [ ] **Phase 5c**：多人開放
 
 詳細功能規格見 [docs/requirements.md](docs/requirements.md)。

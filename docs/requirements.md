@@ -70,7 +70,9 @@ wishlist         願望清單：user_id, card_id, priority, note
 - **Phase 2 — 卡牌目錄**：英文（API）→ 日文（爬蟲）→ 繁中（爬蟲），GitHub Actions 排程
 - **Phase 3 — 選卡整合＋收藏圖鑑**：搜尋/自動完成選卡、卡圖、收集進度、願望清單
 - **Phase 4 — 儀表板＋匯出**：ROI、單卡損益排行、幣別切換、CSV 匯出
-- **Phase 5+**：市價爬蟲與未實現損益、多人開放
+- **Phase 5a — 未實現損益（已完成）**：手動市價欄位（每個持有項目可填目前市價）、未實現損益計算與儀表板顯示
+- **Phase 5b — 自動市價爬蟲**：Yuyu-tei 等來源，卡表比對需要先解決日文卡收藏編號缺失的問題（見 crawler/README.md）
+- **Phase 5c — 多人開放**：技術上已支援（RLS 隔離＋Google 登入），需另外處理 Google OAuth 正式發布審核、濫用防護等營運議題
 
 ## 明確不做（本版）
 

@@ -73,3 +73,25 @@ export function computeStats(lots: LotNumbers[]): PortfolioStats {
 export function realizedRoi(stats: PortfolioStats): number | null {
   return stats.soldCost > 0 ? stats.realizedPnl / stats.soldCost : null;
 }
+
+/**
+ * 未實現損益（手動填的市價 × 剩餘數量 − 剩餘部分的成本）。
+ * 沒填市價就回傳 null，代表這個項目不計入未實現損益總和。
+ */
+export function unrealizedPnl(
+  lots: LotNumbers[],
+  marketPriceTWD: number | null
+): number | null {
+  if (marketPriceTWD === null) return null;
+  let remainingQty = 0;
+  let remainingCost = 0;
+  for (const lot of lots) {
+    const remaining = lotRemaining(lot);
+    if (remaining <= 0) continue;
+    const unitCost = lot.quantity > 0 ? lotCostTWD(lot) / lot.quantity : 0;
+    remainingQty += remaining;
+    remainingCost += unitCost * remaining;
+  }
+  if (remainingQty === 0) return null;
+  return marketPriceTWD * remainingQty - remainingCost;
+}

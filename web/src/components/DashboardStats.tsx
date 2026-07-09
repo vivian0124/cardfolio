@@ -17,6 +17,7 @@ export default function DashboardStats({
   realizedPnl,
   inventoryCost,
   roi,
+  unrealizedPnl,
   topGainers,
   topLosers,
 }: {
@@ -25,6 +26,7 @@ export default function DashboardStats({
   realizedPnl: number;
   inventoryCost: number;
   roi: number | null;
+  unrealizedPnl: number | null;
   topGainers: RankRow[];
   topLosers: RankRow[];
 }) {
@@ -125,10 +127,23 @@ export default function DashboardStats({
         ))}
       </section>
 
-      <section className="rounded-xl border border-gray-200 p-4 dark:border-gray-700">
+      <section className="flex flex-col gap-2 rounded-xl border border-gray-200 p-4 dark:border-gray-700">
         <div className="flex items-center justify-between text-sm">
           <span className="text-gray-500 dark:text-gray-400">在庫成本</span>
           <span className="font-semibold">{fmt(inventoryCost)}</span>
+        </div>
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-gray-500 dark:text-gray-400">
+            未實現損益
+            <span className="ml-1 text-gray-400 dark:text-gray-500">
+              (手動市價)
+            </span>
+          </span>
+          <span
+            className={`font-semibold ${unrealizedPnl === null ? "" : pnlColor(unrealizedPnl)}`}
+          >
+            {unrealizedPnl === null ? "—" : fmt(unrealizedPnl)}
+          </span>
         </div>
       </section>
 

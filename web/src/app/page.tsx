@@ -3,7 +3,12 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import BottomNav from "@/components/BottomNav";
 import DashboardStats from "@/components/DashboardStats";
-import { computeStats, realizedRoi, type LotNumbers } from "@/lib/stats";
+import {
+  computeStats,
+  realizedRoi,
+  unrealizedPnl,
+  type LotNumbers,
+} from "@/lib/stats";
 
 export const dynamic = "force-dynamic";
 
@@ -38,16 +43,19 @@ export default async function Home() {
   const stats = computeStats((lotsData ?? []) as LotNumbers[]);
   const roi = realizedRoi(stats);
 
-  // 單卡損益排行：逐項目算已實現損益，篩出有實際交易的項目
+  // 單卡損益排行 + 未實現損益：逐項目算，篩出有實際交易/有填市價的項目
   const { data: itemsData } = await supabase.from("inventory_items").select(
-    "id, custom_name, purchase_lots(quantity, price, fees, exchange_rate, sales(quantity, price, fees, exchange_rate))"
+    "id, custom_name, market_price_twd, purchase_lots(quantity, price, fees, exchange_rate, sales(quantity, price, fees, exchange_rate))"
   );
   type RankItem = {
     id: string;
     custom_name: string | null;
+    market_price_twd: string | number | null;
     purchase_lots: LotNumbers[];
   };
-  const ranked = ((itemsData ?? []) as RankItem[])
+  const items = (itemsData ?? []) as RankItem[];
+
+  const ranked = items
     .map((item) => ({
       id: item.id,
       name: item.custom_name ?? "未命名",
@@ -62,6 +70,19 @@ export default async function Home() {
     .filter((r) => r.pnl < 0)
     .sort((a, b) => a.pnl - b.pnl)
     .slice(0, 5);
+
+  const unrealizedTotals = items
+    .map((item) =>
+      unrealizedPnl(
+        item.purchase_lots,
+        item.market_price_twd === null ? null : Number(item.market_price_twd)
+      )
+    )
+    .filter((v): v is number => v !== null);
+  const totalUnrealizedPnl =
+    unrealizedTotals.length > 0
+      ? unrealizedTotals.reduce((s, v) => s + v, 0)
+      : null;
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col gap-6 px-4 pb-24 pt-8">
@@ -83,6 +104,7 @@ export default async function Home() {
         realizedPnl={stats.realizedPnl}
         inventoryCost={stats.inventoryCost}
         roi={roi}
+        unrealizedPnl={totalUnrealizedPnl}
         topGainers={topGainers}
         topLosers={topLosers}
       />

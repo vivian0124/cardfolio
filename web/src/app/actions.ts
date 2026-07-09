@@ -213,3 +213,27 @@ export async function deleteItem(itemId: string): Promise<ActionResult> {
   revalidatePath("/items");
   return { error: null };
 }
+
+export async function updateMarketPrice(
+  itemId: string,
+  priceTWD: number | null
+): Promise<ActionResult> {
+  const supabase = await createClient();
+  if (priceTWD !== null && !(priceTWD >= 0)) {
+    return { error: "市價不可為負" };
+  }
+
+  const { error } = await supabase
+    .from("inventory_items")
+    .update({
+      market_price_twd: priceTWD,
+      market_price_updated_at: priceTWD === null ? null : new Date().toISOString(),
+    })
+    .eq("id", itemId);
+  if (error) return { error: error.message };
+
+  revalidatePath("/");
+  revalidatePath("/items");
+  revalidatePath(`/items/${itemId}`);
+  return { error: null };
+}
