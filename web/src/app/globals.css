@@ -1,16 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --background: #070b0a;
-  --foreground: #e8fbf3;
+  --background: #080b09;
+  --foreground: #d9f7e3;
   --surface: rgba(255, 255, 255, 0.035);
   --surface-strong: rgba(255, 255, 255, 0.06);
-  --border: rgba(94, 234, 212, 0.16);
-  --border-strong: rgba(94, 234, 212, 0.4);
-  --accent: #5eead4;
-  --accent-2: #22d3ee;
-  --muted: #6b8a80;
-  --glow: rgba(94, 234, 212, 0.35);
+  --border: rgba(74, 222, 128, 0.16);
+  --border-strong: rgba(74, 222, 128, 0.4);
+  --accent: #4ade80;
+  --accent-2: #34d399;
+  --muted: #6b8a75;
+  --glow: rgba(74, 222, 128, 0.22);
 }
 
 @theme inline {
@@ -39,11 +39,11 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
   background-image:
-    radial-gradient(ellipse 900px 500px at 50% -8%, rgba(94, 234, 212, 0.1), transparent 60%),
+    radial-gradient(ellipse 900px 500px at 50% -8%, rgba(74, 222, 128, 0.08), transparent 60%),
     repeating-linear-gradient(
       to bottom,
-      rgba(94, 234, 212, 0.025) 0px,
-      rgba(94, 234, 212, 0.025) 1px,
+      rgba(74, 222, 128, 0.022) 0px,
+      rgba(74, 222, 128, 0.022) 1px,
       transparent 1px,
       transparent 28px
     );
@@ -133,11 +133,27 @@ button.glass:hover,
 .field:focus {
   outline: none;
   border-color: var(--border-strong);
-  box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.12);
+  box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.12);
 }
 
 .field:disabled {
   opacity: 0.5;
+}
+
+/* select 專用：拿掉原生外觀，換成符合玻璃風格的自訂下拉箭頭 */
+select.field {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 2rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none' stroke='%234ade80' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='5 7.5 10 12.5 15 7.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.6rem center;
+  background-size: 14px;
+}
+
+select.field option {
+  background: #0d1410;
+  color: var(--foreground);
 }
 
 .field-label {
