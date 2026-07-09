@@ -50,7 +50,7 @@ cardfolio/
 - [ ] **Phase 3 — 選卡整合＋收藏圖鑑**：搜尋選卡、卡圖、收集進度、願望清單
 - [ ] **Phase 4 — 儀表板＋匯出**：ROI、單卡損益排行、幣別切換、CSV 匯出
 - [x] **Phase 5a**：手動市價欄位＋未實現損益
-- [ ] **Phase 5b**：自動市價爬蟲
-- [ ] **Phase 5c**：多人開放
+- [x] **Phase 5b**：市價查詢連結（Yuyu-tei，縮小範圍版，見 docs/requirements.md）
+- [ ] **Phase 5c**：多人開放（進行中，目前先用 Google OAuth Testing 白名單開放小圈子）
 
 詳細功能規格見 [docs/requirements.md](docs/requirements.md)。
