@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
@@ -93,6 +94,15 @@ function LoginContent() {
             {guestError}
           </p>
         )}
+      </div>
+
+      <div className="flex gap-3 text-xs text-gray-400 dark:text-gray-500">
+        <Link href="/privacy" className="underline underline-offset-4">
+          隱私權政策
+        </Link>
+        <Link href="/terms" className="underline underline-offset-4">
+          服務條款
+        </Link>
       </div>
     </main>
   );
