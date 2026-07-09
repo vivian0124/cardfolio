@@ -9,6 +9,12 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      # 每個來源各自一個 job、各自 60 分鐘額度，避免跑得慢的來源（例如全量的
+      # ptcg-en）把後面的日文卡表擠到超時、完全沒機會執行
+      matrix:
+        source: [ptcg-en, ptcg-ja, ptcg-zh-tw, opcg-en, opcg-ja]
     steps:
       - uses: actions/checkout@v4
 
@@ -19,10 +25,10 @@ jobs:
       - name: Install dependencies
         run: pip install -r crawler/requirements.txt
 
-      - name: Sync all catalogs
+      - name: Sync ${{ matrix.source }}
         working-directory: crawler
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           PTCG_API_KEY: ${{ secrets.PTCG_API_KEY }}
-        run: python sync.py all
+        run: python sync.py ${{ matrix.source }}
