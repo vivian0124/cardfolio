@@ -83,7 +83,7 @@ export default async function ItemsPage() {
   };
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col gap-4 px-4 pb-24 pt-8">
+    <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col gap-4 px-4 pb-24 pt-8 md:max-w-4xl">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold text-accent">庫存</h1>
         <a
@@ -108,7 +108,9 @@ export default async function ItemsPage() {
           <h2 className="text-xs font-semibold text-muted">
             持有中（{holding.length}）
           </h2>
-          {holding.map(renderItem)}
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+            {holding.map(renderItem)}
+          </div>
         </section>
       )}
 
@@ -117,7 +119,9 @@ export default async function ItemsPage() {
           <h2 className="text-xs font-semibold text-muted">
             已售出（{sold.length}）
           </h2>
-          {sold.map(renderItem)}
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+            {sold.map(renderItem)}
+          </div>
         </section>
       )}
 

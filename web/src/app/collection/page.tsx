@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import BottomNav from "@/components/BottomNav";
+import SetList, { type SetListRow } from "@/components/SetList";
 
 export const dynamic = "force-dynamic";
 
@@ -10,9 +11,9 @@ const GAMES = [
   { id: "opcg", label: "One Piece" },
 ];
 const LANGS = [
+  { id: "zh-TW", label: "繁中" },
   { id: "ja", label: "日文" },
   { id: "en", label: "英文" },
-  { id: "zh-TW", label: "繁中" },
 ];
 
 type SetRow = {
@@ -36,7 +37,9 @@ export default async function CollectionPage({
 
   const params = await searchParams;
   const game = GAMES.some((g) => g.id === params.game) ? params.game! : "ptcg";
-  const lang = LANGS.some((l) => l.id === params.lang) ? params.lang! : "ja";
+  const lang = LANGS.some((l) => l.id === params.lang)
+    ? params.lang!
+    : "zh-TW";
 
   const [{ data: setsData }, { data: ownedData }] = await Promise.all([
     supabase
@@ -66,13 +69,18 @@ export default async function CollectionPage({
     ownedBySet.get(setId)!.add(row.card_id as string);
   }
 
+  const setRows: SetListRow[] = sets.map((s) => ({
+    ...s,
+    owned: ownedBySet.get(s.id)?.size ?? 0,
+  }));
+
   const tabCls = (active: boolean) =>
     `shrink-0 whitespace-nowrap rounded-full px-4 py-1.5 text-sm ${
       active ? "btn-accent" : "btn-ghost text-muted"
     }`;
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col gap-4 px-4 pb-24 pt-8">
+    <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col gap-4 px-4 pb-24 pt-8 md:max-w-4xl">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-bold text-accent">收藏圖鑑</h1>
         <Link
@@ -105,50 +113,13 @@ export default async function CollectionPage({
         ))}
       </div>
 
-      {sets.length === 0 && (
+      {sets.length === 0 ? (
         <p className="py-16 text-center text-sm text-muted">
           這個語系的卡表還沒同步進來
         </p>
+      ) : (
+        <SetList sets={setRows} />
       )}
-
-      <div className="flex flex-col gap-2">
-        {sets.map((s) => {
-          const owned = ownedBySet.get(s.id)?.size ?? 0;
-          const total = s.total_cards;
-          const pct =
-            total && total > 0 ? Math.min(100, (owned / total) * 100) : null;
-          return (
-            <Link
-              key={s.id}
-              href={`/collection/${s.id}`}
-              className="glass glass-hover flex flex-col gap-1.5 p-4"
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span className="min-w-0 truncate text-sm font-medium">
-                  {s.name}
-                </span>
-                <span className="mono-num shrink-0 text-xs text-muted">
-                  {total ? `${owned} / ${total}` : owned > 0 ? `持有 ${owned}` : ""}
-                </span>
-              </div>
-              <div className="flex items-center justify-between gap-2 text-xs text-muted">
-                <span>
-                  {s.code}
-                  {s.release_date && `・${s.release_date}`}
-                </span>
-              </div>
-              {pct !== null && (
-                <div className="progress-track">
-                  <div
-                    className="progress-fill"
-                    style={{ width: `${pct}%` }}
-                  />
-                </div>
-              )}
-            </Link>
-          );
-        })}
-      </div>
 
       <BottomNav />
     </main>

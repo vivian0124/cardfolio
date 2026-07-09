@@ -90,7 +90,7 @@ export default async function ItemDetailPage({
   }));
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col gap-5 px-4 pb-24 pt-8">
+    <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col gap-5 px-4 pb-24 pt-8 md:max-w-2xl">
       <div>
         <Link href="/items" className="text-xs text-muted">
           ← 庫存

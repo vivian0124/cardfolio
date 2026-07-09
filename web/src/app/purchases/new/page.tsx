@@ -29,7 +29,7 @@ export default async function NewPurchasePage({
   }
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col gap-5 px-4 pb-24 pt-8">
+    <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col gap-5 px-4 pb-24 pt-8 md:max-w-2xl">
       <h1 className="text-xl font-bold text-accent">記一筆買入</h1>
       <PurchaseForm initialCard={initialCard} />
       <BottomNav />

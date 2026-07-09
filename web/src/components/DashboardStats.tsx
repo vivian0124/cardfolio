@@ -94,7 +94,7 @@ export default function DashboardStats({
         )}
       </div>
 
-      <section className="grid grid-cols-2 gap-3">
+      <section className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {[
           { label: "總投入", value: fmt(invested), color: "" },
           { label: "總回收", value: fmt(recovered), color: "" },

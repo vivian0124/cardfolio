@@ -35,7 +35,7 @@ export default async function WishlistPage() {
   const rows = (data ?? []) as unknown as WishRow[];
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col gap-4 px-4 pb-24 pt-8">
+    <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col gap-4 px-4 pb-24 pt-8 md:max-w-4xl">
       <div>
         <Link href="/collection" className="text-xs text-muted">
           ← 圖鑑
@@ -49,7 +49,7 @@ export default async function WishlistPage() {
         </p>
       )}
 
-      <div className="flex flex-col gap-2">
+      <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
         {rows.map((w) => {
           const card = w.cards;
           if (!card) return null;

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import BottomNav from "@/components/BottomNav";
-import WishlistButton from "@/components/WishlistButton";
+import CardGrid, { type GridCard } from "@/components/CardGrid";
 
 export const dynamic = "force-dynamic";
 
@@ -54,8 +54,14 @@ export default async function SetPage({
   const owned = new Set((ownedData ?? []).map((r) => r.card_id as string));
   const wished = new Set((wishData ?? []).map((r) => r.card_id as string));
 
+  const gridCards: GridCard[] = cards.map((c) => ({
+    ...c,
+    owned: owned.has(c.id),
+    wished: wished.has(c.id),
+  }));
+
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col gap-4 px-4 pb-24 pt-8">
+    <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col gap-4 px-4 pb-24 pt-8 md:max-w-5xl">
       <div>
         <Link
           href={`/collection?game=${set.game_id}&lang=${set.language}`}
@@ -69,46 +75,7 @@ export default async function SetPage({
         </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
-        {cards.map((c) => (
-          <div
-            key={c.id}
-            className={`glass flex flex-col gap-1 p-1.5 ${
-              owned.has(c.id) ? "glass-owned" : ""
-            }`}
-          >
-            {c.image_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={c.image_url}
-                alt={c.name}
-                loading="lazy"
-                className="aspect-[5/7] w-full rounded object-cover"
-              />
-            ) : (
-              <div className="flex aspect-[5/7] w-full items-center justify-center rounded bg-white/5 p-1 text-center text-xs text-muted">
-                {c.name}
-              </div>
-            )}
-            <div className="flex items-center justify-between px-0.5 text-xs text-muted">
-              <span className="truncate">
-                {c.card_no}
-                {c.rarity && `・${c.rarity}`}
-              </span>
-              {owned.has(c.id) && <span className="text-accent">✓</span>}
-            </div>
-            <div className="flex items-center justify-between px-0.5">
-              <WishlistButton cardId={c.id} initialIn={wished.has(c.id)} />
-              <Link
-                href={`/purchases/new?card=${c.id}`}
-                className="btn-ghost px-2 py-0.5 text-xs text-muted"
-              >
-                ＋買入
-              </Link>
-            </div>
-          </div>
-        ))}
-      </div>
+      <CardGrid cards={gridCards} />
 
       <BottomNav />
     </main>
