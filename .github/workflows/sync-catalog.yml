@@ -1,0 +1,28 @@
+name: Sync card catalog
+
+on:
+  schedule:
+    - cron: "0 21 * * 5" # 每週六 05:00（台北時間）
+  workflow_dispatch: # 也可以在 Actions 頁手動觸發
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r crawler/requirements.txt
+
+      - name: Sync all catalogs
+        working-directory: crawler
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          PTCG_API_KEY: ${{ secrets.PTCG_API_KEY }}
+        run: python sync.py all

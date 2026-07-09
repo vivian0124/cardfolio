@@ -20,3 +20,4 @@ venv/
 # Vercel / Supabase local
 .vercel
 supabase/.temp/
+crawler/.env
