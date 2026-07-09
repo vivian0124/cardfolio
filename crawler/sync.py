@@ -38,8 +38,16 @@ def main() -> None:
         writer = SupabaseWriter()
 
     targets = list(SOURCES) if args.source == "all" else [args.source]
+    failures = []
     for name in targets:
-        SOURCES[name](writer, limit_sets=args.limit_sets)
+        # 一個來源掛掉不影響其他來源，全部跑完再回報失敗
+        try:
+            SOURCES[name](writer, limit_sets=args.limit_sets)
+        except Exception as e:
+            failures.append(name)
+            print(f"[{name}] 同步失敗：{e}")
+    if failures:
+        raise SystemExit(f"部分來源失敗：{failures}")
 
 
 if __name__ == "__main__":
