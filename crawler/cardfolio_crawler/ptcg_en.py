@@ -102,18 +102,20 @@ def sync(writer, limit_sets: int | None = None, log=print) -> None:
     total = 0
     failed: list[str] = []
     for s in sets:
-        # 單一系列失敗就跳過，不讓整批同步中斷（下週排程會再補到）
+        # 單一系列失敗（抓取或寫入）就跳過，不讓整批同步中斷（下週排程會再補到）
         try:
             cards = fetch_cards(s["code"])
+            # 同系列偶有重複卡號（資料源瑕疵），同一批 upsert 不能撞同一列，保留第一筆
+            cards = list({c["card_no"]: c for c in reversed(cards)}.values())
+            if writer and cards:
+                for c in cards:
+                    c["set_id"] = id_map[s["code"]]
+                writer.upsert("cards", cards, on_conflict="set_id,card_no")
         except Exception as e:
             failed.append(s["code"])
             log(f"[ptcg-en] {s['code']} 失敗，跳過：{e}")
             continue
         total += len(cards)
         log(f"[ptcg-en] {s['code']} {s['name']}: {len(cards)} 張")
-        if writer and cards:
-            for c in cards:
-                c["set_id"] = id_map[s["code"]]
-            writer.upsert("cards", cards, on_conflict="set_id,card_no")
         time.sleep(SLEEP)
     log(f"[ptcg-en] 完成，共 {total} 張" + (f"，{len(failed)} 個系列失敗：{failed}" if failed else ""))

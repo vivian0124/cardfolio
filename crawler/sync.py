@@ -11,14 +11,17 @@
 """
 
 import argparse
+from functools import partial
 
 from dotenv import load_dotenv
 
-from cardfolio_crawler import opcg_en, ptcg_en
+from cardfolio_crawler import opcg, ptcg_en, ptcg_ja
 
 SOURCES = {
     "ptcg-en": ptcg_en.sync,
-    "opcg-en": opcg_en.sync,
+    "opcg-en": partial(opcg.sync, language="en"),
+    "opcg-ja": partial(opcg.sync, language="ja"),
+    "ptcg-ja": ptcg_ja.sync,
 }
 
 
