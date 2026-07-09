@@ -1,0 +1,104 @@
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase/server";
+import BottomNav from "@/components/BottomNav";
+import { fmtTWD } from "@/lib/format";
+import { lotCostTWD, lotRemaining, type LotNumbers } from "@/lib/stats";
+
+export const dynamic = "force-dynamic";
+
+type ItemRow = {
+  id: string;
+  item_type: string;
+  custom_name: string | null;
+  condition: string | null;
+  grading: string | null;
+  status: string;
+  purchase_lots: LotNumbers[];
+};
+
+export default async function ItemsPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+
+  const { data } = await supabase
+    .from("inventory_items")
+    .select(
+      "id, item_type, custom_name, condition, grading, status, purchase_lots(quantity, price, fees, exchange_rate, sales(quantity, price, fees, exchange_rate))"
+    )
+    .order("created_at", { ascending: false });
+
+  const items = (data ?? []) as ItemRow[];
+  const holding = items.filter((i) => i.status === "holding");
+  const sold = items.filter((i) => i.status === "sold");
+
+  const renderItem = (item: ItemRow) => {
+    const remaining = item.purchase_lots.reduce(
+      (sum, l) => sum + lotRemaining(l),
+      0
+    );
+    const cost = item.purchase_lots.reduce((sum, l) => sum + lotCostTWD(l), 0);
+    return (
+      <Link
+        key={item.id}
+        href={`/items/${item.id}`}
+        className="flex items-center justify-between gap-3 rounded-xl border border-gray-200 p-4 dark:border-gray-800"
+      >
+        <div className="min-w-0">
+          <div className="truncate text-sm font-medium">
+            {item.custom_name}
+          </div>
+          <div className="mt-0.5 flex flex-wrap gap-1.5 text-xs text-gray-500 dark:text-gray-400">
+            <span>{item.item_type === "card" ? "單卡" : "密封品"}</span>
+            {item.condition && <span>・{item.condition}</span>}
+            {item.grading && <span>・{item.grading}</span>}
+          </div>
+        </div>
+        <div className="shrink-0 text-right">
+          <div className="text-sm font-semibold">{fmtTWD(cost)}</div>
+          <div className="text-xs text-gray-500 dark:text-gray-400">
+            {item.status === "sold" ? "已售出" : `持有 ${remaining}`}
+          </div>
+        </div>
+      </Link>
+    );
+  };
+
+  return (
+    <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col gap-4 px-4 pb-24 pt-8">
+      <h1 className="text-xl font-bold">庫存</h1>
+
+      {items.length === 0 && (
+        <p className="py-16 text-center text-sm text-gray-500 dark:text-gray-400">
+          還沒有任何紀錄，先去
+          <Link href="/purchases/new" className="underline underline-offset-4">
+            記一筆買入
+          </Link>
+        </p>
+      )}
+
+      {holding.length > 0 && (
+        <section className="flex flex-col gap-2">
+          <h2 className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+            持有中（{holding.length}）
+          </h2>
+          {holding.map(renderItem)}
+        </section>
+      )}
+
+      {sold.length > 0 && (
+        <section className="mt-2 flex flex-col gap-2">
+          <h2 className="text-xs font-semibold text-gray-500 dark:text-gray-400">
+            已售出（{sold.length}）
+          </h2>
+          {sold.map(renderItem)}
+        </section>
+      )}
+
+      <BottomNav />
+    </main>
+  );
+}
