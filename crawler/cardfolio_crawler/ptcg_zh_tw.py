@@ -152,14 +152,16 @@ def sync(writer, limit_sets: int | None = None, log=print) -> None:
                     }
                 )
                 time.sleep(SLEEP)
-            budget -= len(rows)
-            total_new += len(rows)
+            budget -= len(rows)  # 偵測頁請求已經打出去，不論寫入是否成功都算花掉
 
             if writer and rows:
                 for r in rows:
                     r["set_id"] = id_map[exp["code"]]
                 # 同系列同編號的異圖卡以 external_id 區分
                 writer.upsert("cards", rows, on_conflict="external_id")
+                total_new += len(rows)  # 只有寫入成功才計入，避免整批失敗時虛報
+            elif not writer:
+                total_new += len(rows)  # dry-run 沒有實際寫入，計數僅供預覽
         except Exception as e:
             failed.append(exp["code"])
             log(f"[ptcg-zh-tw] {exp['code']} 失敗，跳過：{e}")

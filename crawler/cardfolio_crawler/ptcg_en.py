@@ -110,7 +110,8 @@ def sync(writer, limit_sets: int | None = None, log=print) -> None:
             if writer and cards:
                 for c in cards:
                     c["set_id"] = id_map[s["code"]]
-                writer.upsert("cards", cards, on_conflict="set_id,card_no")
+                    c["external_id"] = f"ptcg-en-{s['code']}-{c['card_no']}"
+                writer.upsert("cards", cards, on_conflict="external_id")
         except Exception as e:
             failed.append(s["code"])
             log(f"[ptcg-en] {s['code']} 失敗，跳過：{e}")

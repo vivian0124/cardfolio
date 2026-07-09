@@ -102,7 +102,8 @@ def sync(writer, language: str, limit_sets: int | None = None, log=print) -> Non
                 id_map = writer.set_id_map("opcg", language)
                 for c in cards:
                     c["set_id"] = id_map[s["code"]]
-                writer.upsert("cards", cards, on_conflict="set_id,card_no")
+                    c["external_id"] = f"opcg-{language}-{s['code']}-{c['card_no']}"
+                writer.upsert("cards", cards, on_conflict="external_id")
         except Exception as e:
             failed.append(s["code"])
             log(f"{tag} {s['code']} 失敗，跳過：{e}")

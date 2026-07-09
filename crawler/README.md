@@ -11,6 +11,9 @@
 | `ptcg-zh-tw` | PTCG 繁中，asia.pokemon-card.com/tw。卡名要進詳細頁，採**增量同步**：每次最多抓 `PTCG_TW_MAX_DETAILS`（預設 1500）張新卡，跑幾次自然補完 |
 
 > `ptcg-ja` 需要先執行 `supabase/migrations/0002_cards_external_id.sql`。
+> `ptcg-zh-tw` 需要再執行 `supabase/migrations/0003_unify_card_identity.sql`
+> （繁中卡表有些多來源合輯商品會共用同一個印刷收藏編號，所有來源統一改用
+> `external_id` 當識別鍵才不會互相卡住）。
 
 ## 本機執行
 
