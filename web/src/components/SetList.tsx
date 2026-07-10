@@ -13,31 +13,53 @@ export type SetListRow = {
   owned: number;
 };
 
+type MatchedCard = {
+  id: string;
+  card_no: string;
+  name: string;
+  image_url: string | null;
+};
+
+const THUMBS_PER_SET = 6;
+
 export default function SetList({
   sets,
   game,
   lang,
+  initialQuery,
 }: {
   sets: SetListRow[];
   game: string;
   lang: string;
+  initialQuery?: string;
 }) {
-  const [q, setQ] = useState("");
+  const [q, setQ] = useState(initialQuery ?? "");
   const [ownedOnly, setOwnedOnly] = useState(false);
-  // 關鍵字有比對到「系列裡的卡片名稱」時，該系列的 id 會出現在這裡
-  const [cardMatchSetIds, setCardMatchSetIds] = useState<Set<string>>(
-    new Set()
+  // set_id -> 該系列中名稱符合關鍵字的卡（含縮圖）
+  const [matchesBySet, setMatchesBySet] = useState<Map<string, MatchedCard[]>>(
+    new Map()
   );
   const [searchingCards, setSearchingCards] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const keyword = q.trim().toLowerCase();
 
-  // 除了系列名稱，也到卡牌目錄查「哪些系列含有名稱符合的卡」
+  // 搜尋條件寫回網址：點進系列再返回時，伺服器會把 q 帶回來還原狀態
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (q.trim()) {
+      url.searchParams.set("q", q.trim());
+    } else {
+      url.searchParams.delete("q");
+    }
+    window.history.replaceState(null, "", url.toString());
+  }, [q]);
+
+  // 除了系列名稱，也到卡牌目錄查「哪些系列含有名稱符合的卡」＋抓縮圖
   useEffect(() => {
     if (timer.current) clearTimeout(timer.current);
     if (keyword.length < 2) {
-      setCardMatchSetIds(new Set());
+      setMatchesBySet(new Map());
       setSearchingCards(false);
       return;
     }
@@ -46,12 +68,25 @@ export default function SetList({
       const supabase = createClient();
       const { data } = await supabase
         .from("cards")
-        .select("set_id, card_sets!inner(game_id, language)")
+        .select(
+          "id, set_id, card_no, name, image_url, card_sets!inner(game_id, language)"
+        )
         .ilike("name", `%${keyword}%`)
         .eq("card_sets.game_id", game)
         .eq("card_sets.language", lang)
         .limit(1000);
-      setCardMatchSetIds(new Set((data ?? []).map((r) => r.set_id as string)));
+      const grouped = new Map<string, MatchedCard[]>();
+      for (const row of data ?? []) {
+        const setId = row.set_id as string;
+        if (!grouped.has(setId)) grouped.set(setId, []);
+        grouped.get(setId)!.push({
+          id: row.id,
+          card_no: row.card_no,
+          name: row.name,
+          image_url: row.image_url,
+        });
+      }
+      setMatchesBySet(grouped);
       setSearchingCards(false);
     }, 350);
     return () => {
@@ -65,7 +100,7 @@ export default function SetList({
     return (
       s.name.toLowerCase().includes(keyword) ||
       s.code.toLowerCase().includes(keyword) ||
-      cardMatchSetIds.has(s.id)
+      matchesBySet.has(s.id)
     );
   });
 
@@ -90,9 +125,7 @@ export default function SetList({
         </button>
       </div>
 
-      {searchingCards && (
-        <p className="text-xs text-muted">搜尋卡片中…</p>
-      )}
+      {searchingCards && <p className="text-xs text-muted">搜尋卡片中…</p>}
 
       {!searchingCards && filtered.length === 0 && (
         <p className="py-10 text-center text-sm text-muted">
@@ -105,16 +138,12 @@ export default function SetList({
           const total = s.total_cards;
           const pct =
             total && total > 0 ? Math.min(100, (s.owned / total) * 100) : null;
-          const viaCard =
-            keyword.length >= 2 &&
-            cardMatchSetIds.has(s.id) &&
-            !s.name.toLowerCase().includes(keyword) &&
-            !s.code.toLowerCase().includes(keyword);
+          const matched = keyword.length >= 2 ? matchesBySet.get(s.id) : null;
           return (
             <Link
               key={s.id}
               href={`/collection/${s.id}${
-                viaCard ? `?q=${encodeURIComponent(q.trim())}` : ""
+                matched ? `?q=${encodeURIComponent(q.trim())}` : ""
               }`}
               className="glass glass-hover flex flex-col gap-1.5 p-4"
             >
@@ -135,15 +164,44 @@ export default function SetList({
                   {s.code}
                   {s.release_date && `・${s.release_date}`}
                 </span>
-                {viaCard && (
-                  <span className="shrink-0 rounded-full border border-border px-2 py-0.5 text-accent">
-                    含「{q.trim()}」的卡
+                {matched && (
+                  <span className="shrink-0 text-accent">
+                    {matched.length} 張符合
                   </span>
                 )}
               </div>
               {pct !== null && (
                 <div className="progress-track">
                   <div className="progress-fill" style={{ width: `${pct}%` }} />
+                </div>
+              )}
+              {matched && (
+                <div className="mt-1 flex items-end gap-1.5 overflow-hidden">
+                  {matched.slice(0, THUMBS_PER_SET).map((c) =>
+                    c.image_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        key={c.id}
+                        src={c.image_url}
+                        alt={c.name}
+                        title={`${c.card_no} ${c.name}`}
+                        loading="lazy"
+                        className="h-16 w-auto shrink-0 rounded border border-border object-cover"
+                      />
+                    ) : (
+                      <span
+                        key={c.id}
+                        className="flex h-16 w-11 shrink-0 items-center justify-center rounded border border-border bg-white/5 p-0.5 text-center text-[10px] leading-tight text-muted"
+                      >
+                        {c.card_no}
+                      </span>
+                    )
+                  )}
+                  {matched.length > THUMBS_PER_SET && (
+                    <span className="shrink-0 pb-1 text-xs text-muted">
+                      +{matched.length - THUMBS_PER_SET}
+                    </span>
+                  )}
                 </div>
               )}
             </Link>

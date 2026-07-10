@@ -27,7 +27,7 @@ type SetRow = {
 export default async function CollectionPage({
   searchParams,
 }: {
-  searchParams: Promise<{ game?: string; lang?: string }>;
+  searchParams: Promise<{ game?: string; lang?: string; q?: string }>;
 }) {
   const supabase = await createClient();
   const {
@@ -118,7 +118,7 @@ export default async function CollectionPage({
           這個語系的卡表還沒同步進來
         </p>
       ) : (
-        <SetList sets={setRows} game={game} lang={lang} />
+        <SetList sets={setRows} game={game} lang={lang} initialQuery={params.q} />
       )}
 
       <BottomNav />

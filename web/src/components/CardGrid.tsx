@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import WishlistButton from "@/components/WishlistButton";
 
 export type GridCard = {
@@ -23,6 +23,17 @@ export default function CardGrid({
 }) {
   const [q, setQ] = useState(initialQuery ?? "");
   const [ownedOnly, setOwnedOnly] = useState(false);
+
+  // 搜尋條件寫回網址，返回這頁時可還原
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (q.trim()) {
+      url.searchParams.set("q", q.trim());
+    } else {
+      url.searchParams.delete("q");
+    }
+    window.history.replaceState(null, "", url.toString());
+  }, [q]);
 
   const keyword = q.trim().toLowerCase();
   const filtered = cards.filter((c) => {
