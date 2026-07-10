@@ -14,8 +14,14 @@ export type GridCard = {
   wished: boolean;
 };
 
-export default function CardGrid({ cards }: { cards: GridCard[] }) {
-  const [q, setQ] = useState("");
+export default function CardGrid({
+  cards,
+  initialQuery,
+}: {
+  cards: GridCard[];
+  initialQuery?: string;
+}) {
+  const [q, setQ] = useState(initialQuery ?? "");
   const [ownedOnly, setOwnedOnly] = useState(false);
 
   const keyword = q.trim().toLowerCase();

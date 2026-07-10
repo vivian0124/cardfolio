@@ -118,7 +118,7 @@ export default async function CollectionPage({
           這個語系的卡表還沒同步進來
         </p>
       ) : (
-        <SetList sets={setRows} />
+        <SetList sets={setRows} game={game} lang={lang} />
       )}
 
       <BottomNav />

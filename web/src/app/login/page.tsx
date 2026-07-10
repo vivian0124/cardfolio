@@ -2,11 +2,10 @@
 
 import { Suspense, useState } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 function LoginContent() {
-  const router = useRouter();
   const [loading, setLoading] = useState<"google" | "guest" | null>(null);
   const [guestError, setGuestError] = useState<string | null>(null);
   const searchParams = useSearchParams();
@@ -29,12 +28,17 @@ function LoginContent() {
     const supabase = createClient();
     const { error } = await supabase.auth.signInAnonymously();
     if (error) {
-      setGuestError("訪客登入目前無法使用，請改用 Google 登入");
+      setGuestError(
+        error.status === 429
+          ? "短時間內建立太多訪客帳號，請稍後再試或改用 Google 登入"
+          : "訪客登入目前無法使用，請改用 Google 登入"
+      );
       setLoading(null);
       return;
     }
-    router.push("/");
-    router.refresh();
+    // 用整頁跳轉確保帶著新 session 重新向伺服器要求首頁，
+    // 避免 client router 兩段式跳轉在冷啟動時卡在「進入中…」
+    window.location.href = "/";
   };
 
   return (

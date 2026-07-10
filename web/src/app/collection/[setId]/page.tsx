@@ -16,8 +16,10 @@ type CardRow = {
 
 export default async function SetPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ setId: string }>;
+  searchParams: Promise<{ q?: string }>;
 }) {
   const supabase = await createClient();
   const {
@@ -26,6 +28,7 @@ export default async function SetPage({
   if (!user) redirect("/login");
 
   const { setId } = await params;
+  const { q } = await searchParams;
   const [{ data: set }, { data: cardsData }, { data: ownedData }, { data: wishData }] =
     await Promise.all([
       supabase
@@ -75,7 +78,7 @@ export default async function SetPage({
         </p>
       </div>
 
-      <CardGrid cards={gridCards} />
+      <CardGrid cards={gridCards} initialQuery={q} />
 
       <BottomNav />
     </main>
