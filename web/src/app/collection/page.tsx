@@ -37,9 +37,20 @@ export default async function CollectionPage({
 
   const params = await searchParams;
   const game = GAMES.some((g) => g.id === params.game) ? params.game! : "ptcg";
-  const lang = LANGS.some((l) => l.id === params.lang)
-    ? params.lang!
-    : "zh-TW";
+
+  // 只保留這個遊戲真的有卡表的語言（OPCG 目前沒繁中 → 繁中分頁自動消失）
+  const { data: langRows } = await supabase
+    .from("card_sets")
+    .select("language")
+    .eq("game_id", game);
+  const availableLangs = new Set((langRows ?? []).map((r) => r.language));
+  const langs = LANGS.filter((l) => availableLangs.has(l.id));
+
+  // 選定語言：網址指定的優先，否則用這個遊戲第一個有資料的語言
+  const requestedLang = params.lang && availableLangs.has(params.lang)
+    ? params.lang
+    : null;
+  const lang = requestedLang ?? langs[0]?.id ?? "en";
 
   const [{ data: setsData }, { data: ownedData }] = await Promise.all([
     supabase
@@ -102,7 +113,7 @@ export default async function CollectionPage({
           </Link>
         ))}
         <span className="mx-1 shrink-0 self-center text-muted">|</span>
-        {LANGS.map((l) => (
+        {langs.map((l) => (
           <Link
             key={l.id}
             href={`/collection?game=${game}&lang=${l.id}`}

@@ -67,12 +67,13 @@ export default function SetList({
     setSearchingCards(true);
     timer.current = setTimeout(async () => {
       const supabase = createClient();
+      // 卡名或卡號任一符合都算（打卡名如「魯夫」、卡號如「OP01-025」「025」都能找）
       const { data } = await supabase
         .from("cards")
         .select(
           "id, set_id, card_no, name, image_url, card_sets!inner(game_id, language)"
         )
-        .ilike("name", `%${keyword}%`)
+        .or(`name.ilike.%${keyword}%,card_no.ilike.%${keyword}%`)
         .eq("card_sets.game_id", game)
         .eq("card_sets.language", lang)
         .limit(1000);
