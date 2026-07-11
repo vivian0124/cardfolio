@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import CardThumb from "@/components/CardThumb";
 import { createClient } from "@/lib/supabase/client";
 
 export type SetListRow = {
@@ -179,13 +180,12 @@ export default function SetList({
                 <div className="mt-1 flex items-end gap-1.5 overflow-hidden">
                   {matched.slice(0, THUMBS_PER_SET).map((c) =>
                     c.image_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
+                      <CardThumb
                         key={c.id}
                         src={c.image_url}
                         alt={c.name}
                         title={`${c.card_no} ${c.name}`}
-                        loading="lazy"
+                        width={120}
                         className="h-16 w-auto shrink-0 rounded border border-border object-cover"
                       />
                     ) : (

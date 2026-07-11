@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import CardThumb from "@/components/CardThumb";
 import WishlistButton from "@/components/WishlistButton";
 
 export type GridCard = {
@@ -80,11 +81,10 @@ export default function CardGrid({
             }`}
           >
             {c.image_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <CardThumb
                 src={c.image_url}
                 alt={c.name}
-                loading="lazy"
+                width={400}
                 className="aspect-[5/7] w-full rounded object-cover"
               />
             ) : (

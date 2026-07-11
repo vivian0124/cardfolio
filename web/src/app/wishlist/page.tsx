@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import BottomNav from "@/components/BottomNav";
+import CardThumb from "@/components/CardThumb";
 import WishlistButton from "@/components/WishlistButton";
 
 export const dynamic = "force-dynamic";
@@ -59,11 +60,10 @@ export default async function WishlistPage() {
           return (
             <div key={w.id} className="glass flex items-center gap-3 p-3">
               {card.image_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
+                <CardThumb
                   src={card.image_url}
                   alt=""
-                  loading="lazy"
+                  width={100}
                   className="h-16 w-12 shrink-0 rounded object-cover"
                 />
               ) : (

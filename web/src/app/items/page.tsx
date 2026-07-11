@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import BottomNav from "@/components/BottomNav";
+import CardThumb from "@/components/CardThumb";
 import { fmtTWD } from "@/lib/format";
 import { lotCostTWD, lotRemaining, type LotNumbers } from "@/lib/stats";
 
@@ -50,11 +51,10 @@ export default async function ItemsPage() {
         className="glass glass-hover flex items-center justify-between gap-3 p-3"
       >
         {card?.image_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <CardThumb
             src={card.image_url}
             alt=""
-            loading="lazy"
+            width={80}
             className="h-14 w-10 shrink-0 rounded object-cover"
           />
         ) : (

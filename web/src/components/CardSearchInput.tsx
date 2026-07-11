@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import CardThumb from "@/components/CardThumb";
 import { createClient } from "@/lib/supabase/client";
 
 export type CardHit = {
@@ -106,12 +107,11 @@ export default function CardSearchInput({
                 }}
               >
                 {h.image_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
+                  <CardThumb
                     src={h.image_url}
                     alt=""
+                    width={80}
                     className="h-12 w-9 shrink-0 rounded object-cover"
-                    loading="lazy"
                   />
                 ) : (
                   <span className="h-12 w-9 shrink-0 rounded bg-white/5" />
