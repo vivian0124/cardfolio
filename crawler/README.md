@@ -50,6 +50,14 @@ GitHub Actions（`.github/workflows/sync-catalog.yml`）每週六早上自動跑
 - `SUPABASE_SERVICE_ROLE_KEY`
 - `PTCG_API_KEY`（選填）
 
+## 手動補的目錄資料
+
+- **美版 `mep`（Mega Evolution Black Star Promos）**：pokemontcg.io 尚未收錄 ME 世代特典卡，
+  2026-07-11 手動建立系列並補入 First Partner Illustration Collection Series 1+2 的 18 張
+  promo（卡號 37–54，來源：官方商品頁與市場實卡照）。external_id 採用與 ptcg-en 爬蟲一致的
+  `ptcg-en-mep-<卡號>` 格式，未來上游補齊時每週同步會自動 merge 並帶入卡圖。
+  Series 3（豐緣/卡洛斯/帕底亞）預計 2026-09 發售，卡號公布後再補。
+
 ## 之後的來源（Phase 2 後段）
 
 - `ptcg-ja` 補完：進單卡詳細頁補收藏編號（046/106 這種）與稀有度、商品名稱對應
