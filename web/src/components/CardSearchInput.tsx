@@ -52,12 +52,14 @@ export default function CardSearchInput({
     timer.current = setTimeout(async () => {
       setSearching(true);
       const supabase = createClient();
+      const kw = q.trim();
+      // 卡名、卡號、或繁中別名(OPCG 才有)任一符合
       const { data } = await supabase
         .from("cards")
         .select(
           "id, name, card_no, image_url, card_sets!inner(code, language, game_id)"
         )
-        .ilike("name", `%${q.trim()}%`)
+        .or(`name.ilike.%${kw}%,card_no.ilike.%${kw}%,name_zh.ilike.%${kw}%`)
         .limit(12);
       setHits(
         (data ?? []).map((c) => ({

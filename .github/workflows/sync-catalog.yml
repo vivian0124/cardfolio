@@ -14,7 +14,7 @@ jobs:
       # 每個來源各自一個 job、各自 60 分鐘額度，避免跑得慢的來源（例如全量的
       # ptcg-en）把後面的日文卡表擠到超時、完全沒機會執行
       matrix:
-        source: [ptcg-en, ptcg-ja, ptcg-zh-tw, opcg-en, opcg-ja]
+        source: [ptcg-en, ptcg-ja, ptcg-zh-tw, opcg-en, opcg-ja, opcg-zh-alias]
     steps:
       - uses: actions/checkout@v4
 

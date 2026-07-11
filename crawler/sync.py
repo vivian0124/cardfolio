@@ -15,7 +15,7 @@ from functools import partial
 
 from dotenv import load_dotenv
 
-from cardfolio_crawler import opcg, ptcg_en, ptcg_ja, ptcg_zh_tw
+from cardfolio_crawler import opcg, opcg_zh_alias, ptcg_en, ptcg_ja, ptcg_zh_tw
 
 SOURCES = {
     "ptcg-en": ptcg_en.sync,
@@ -23,6 +23,7 @@ SOURCES = {
     "opcg-ja": partial(opcg.sync, language="ja"),
     "ptcg-ja": ptcg_ja.sync,
     "ptcg-zh-tw": ptcg_zh_tw.sync,
+    "opcg-zh-alias": opcg_zh_alias.sync,
 }
 
 

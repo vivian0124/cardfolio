@@ -73,7 +73,9 @@ export default function SetList({
         .select(
           "id, set_id, card_no, name, image_url, card_sets!inner(game_id, language)"
         )
-        .or(`name.ilike.%${keyword}%,card_no.ilike.%${keyword}%`)
+        .or(
+          `name.ilike.%${keyword}%,card_no.ilike.%${keyword}%,name_zh.ilike.%${keyword}%`
+        )
         .eq("card_sets.game_id", game)
         .eq("card_sets.language", lang)
         .limit(1000);

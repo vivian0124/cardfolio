@@ -9,6 +9,7 @@ export type GridCard = {
   id: string;
   card_no: string;
   name: string;
+  name_zh: string | null;
   rarity: string | null;
   image_url: string | null;
   owned: boolean;
@@ -42,6 +43,7 @@ export default function CardGrid({
     if (!keyword) return true;
     return (
       c.name.toLowerCase().includes(keyword) ||
+      (c.name_zh ?? "").toLowerCase().includes(keyword) ||
       c.card_no.toLowerCase().includes(keyword) ||
       (c.rarity ?? "").toLowerCase().includes(keyword)
     );

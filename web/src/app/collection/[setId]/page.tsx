@@ -10,6 +10,7 @@ type CardRow = {
   id: string;
   card_no: string;
   name: string;
+  name_zh: string | null;
   rarity: string | null;
   image_url: string | null;
 };
@@ -38,7 +39,7 @@ export default async function SetPage({
         .maybeSingle(),
       supabase
         .from("cards")
-        .select("id, card_no, name, rarity, image_url")
+        .select("id, card_no, name, name_zh, rarity, image_url")
         .eq("set_id", setId)
         .order("card_no")
         .limit(1000),
