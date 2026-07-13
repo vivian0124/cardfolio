@@ -45,19 +45,24 @@ export default async function ItemDetailPage({
 }) {
   const { id } = await params;
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+
+  // 身分驗證與查詢平行跑，省一趟資料庫往返
+  const [
+    {
+      data: { user },
+    },
+    { data: item },
+  ] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase
+      .from("inventory_items")
+      .select(
+        "id, item_type, custom_name, condition, grading, status, note, market_price_twd, market_price_updated_at, cards(name, card_sets(game_id)), purchase_lots(id, quantity, price, currency, exchange_rate, fees, channel, purchased_at, note, sales(id, quantity, price, currency, exchange_rate, fees, buyer_note, sold_at))"
+      )
+      .eq("id", id)
+      .single(),
+  ]);
   if (!user) redirect("/login");
-
-  const { data: item } = await supabase
-    .from("inventory_items")
-    .select(
-      "id, item_type, custom_name, condition, grading, status, note, market_price_twd, market_price_updated_at, cards(name, card_sets(game_id)), purchase_lots(id, quantity, price, currency, exchange_rate, fees, channel, purchased_at, note, sales(id, quantity, price, currency, exchange_rate, fees, buyer_note, sold_at))"
-    )
-    .eq("id", id)
-    .single();
-
   if (!item) notFound();
 
   const linkedCard = Array.isArray(item.cards) ? item.cards[0] : item.cards;

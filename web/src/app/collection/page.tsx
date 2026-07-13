@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { getSetsByGame } from "@/lib/catalog";
 import BottomNav from "@/components/BottomNav";
 import SetList, { type SetListRow } from "@/components/SetList";
 
@@ -16,59 +17,41 @@ const LANGS = [
   { id: "en", label: "英文" },
 ];
 
-type SetRow = {
-  id: string;
-  code: string;
-  name: string;
-  release_date: string | null;
-  total_cards: number | null;
-};
-
 export default async function CollectionPage({
   searchParams,
 }: {
   searchParams: Promise<{ game?: string; lang?: string; q?: string }>;
 }) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
-
   const params = await searchParams;
   const game = GAMES.some((g) => g.id === params.game) ? params.game! : "ptcg";
 
-  // 只保留這個遊戲真的有卡表的語言（OPCG 目前沒繁中 → 繁中分頁自動消失）
-  const { data: langRows } = await supabase
-    .from("card_sets")
-    .select("language")
-    .eq("game_id", game);
-  const availableLangs = new Set((langRows ?? []).map((r) => r.language));
-  const langs = LANGS.filter((l) => availableLangs.has(l.id));
-
-  // 選定語言：網址指定的優先，否則用這個遊戲第一個有資料的語言
-  const requestedLang = params.lang && availableLangs.has(params.lang)
-    ? params.lang
-    : null;
-  const lang = requestedLang ?? langs[0]?.id ?? "en";
-
-  const [{ data: setsData }, { data: ownedData }] = await Promise.all([
-    supabase
-      .from("card_sets")
-      .select("id, code, name, release_date, total_cards")
-      .eq("game_id", game)
-      .eq("language", lang)
-      .order("release_date", { ascending: false, nullsFirst: false })
-      .order("code", { ascending: false })
-      .limit(500),
+  // 三路平行：身分驗證、卡表（跨使用者快取）、使用者持有資料
+  const [
+    {
+      data: { user },
+    },
+    allSets,
+    { data: ownedData },
+  ] = await Promise.all([
+    supabase.auth.getUser(),
+    getSetsByGame(game),
     supabase
       .from("inventory_items")
       .select("card_id, cards!inner(set_id)")
       .not("card_id", "is", null)
       .eq("status", "holding"),
   ]);
+  if (!user) redirect("/login");
 
-  const sets = (setsData ?? []) as SetRow[];
+  // 只保留這個遊戲真的有卡表的語言（OPCG 目前沒繁中 → 繁中分頁自動消失）
+  const availableLangs = new Set(allSets.map((s) => s.language));
+  const langs = LANGS.filter((l) => availableLangs.has(l.id));
+  const requestedLang =
+    params.lang && availableLangs.has(params.lang) ? params.lang : null;
+  const lang = requestedLang ?? langs[0]?.id ?? "en";
+
+  const sets = allSets.filter((s) => s.language === lang);
   // 每個系列持有幾種不同的卡（收集進度算「種類」不算張數）
   const ownedBySet = new Map<string, Set<string>>();
   for (const row of ownedData ?? []) {

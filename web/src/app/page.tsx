@@ -31,24 +31,25 @@ export default async function Home() {
   }
 
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+
+  // 身分驗證與資料查詢平行跑（RLS 用 cookie 裡的 JWT，不需等 getUser 回來）；
+  // 一次撈 items+lots+sales，整體統計由同一份資料 flatten 計算，省掉重複查詢
+  const [
+    {
+      data: { user },
+    },
+    { data: itemsData },
+  ] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase
+      .from("inventory_items")
+      .select(
+        "id, custom_name, market_price_twd, purchase_lots(quantity, price, fees, exchange_rate, sales(quantity, price, fees, exchange_rate))"
+      ),
+  ]);
 
   if (!user) redirect("/login");
 
-  const { data: lotsData } = await supabase
-    .from("purchase_lots")
-    .select(
-      "quantity, price, fees, exchange_rate, sales(quantity, price, fees, exchange_rate)"
-    );
-  const stats = computeStats((lotsData ?? []) as LotNumbers[]);
-  const roi = realizedRoi(stats);
-
-  // 單卡損益排行 + 未實現損益：逐項目算，篩出有實際交易/有填市價的項目
-  const { data: itemsData } = await supabase.from("inventory_items").select(
-    "id, custom_name, market_price_twd, purchase_lots(quantity, price, fees, exchange_rate, sales(quantity, price, fees, exchange_rate))"
-  );
   type RankItem = {
     id: string;
     custom_name: string | null;
@@ -56,6 +57,9 @@ export default async function Home() {
     purchase_lots: LotNumbers[];
   };
   const items = (itemsData ?? []) as RankItem[];
+
+  const stats = computeStats(items.flatMap((i) => i.purchase_lots));
+  const roi = realizedRoi(stats);
 
   const ranked = items
     .map((item) => ({

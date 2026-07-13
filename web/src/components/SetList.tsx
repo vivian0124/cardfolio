@@ -209,6 +209,7 @@ export default function SetList({
           return (
             <Link
               key={s.id}
+              prefetch={false}
               href={`/collection/${s.id}${
                 matched ? `?q=${encodeURIComponent(q.trim())}` : ""
               }`}

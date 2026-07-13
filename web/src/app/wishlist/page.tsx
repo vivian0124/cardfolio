@@ -21,17 +21,23 @@ type WishRow = {
 
 export default async function WishlistPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
 
-  const { data } = await supabase
-    .from("wishlist")
-    .select(
-      "id, card_id, cards(id, name, card_no, image_url, card_sets(code, language))"
-    )
-    .order("created_at", { ascending: false });
+  // 身分驗證與查詢平行跑，省一趟資料庫往返
+  const [
+    {
+      data: { user },
+    },
+    { data },
+  ] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase
+      .from("wishlist")
+      .select(
+        "id, card_id, cards(id, name, card_no, image_url, card_sets(code, language))"
+      )
+      .order("created_at", { ascending: false }),
+  ]);
+  if (!user) redirect("/login");
 
   const rows = (data ?? []) as unknown as WishRow[];
 
@@ -77,6 +83,7 @@ export default async function WishlistPage() {
               </div>
               <div className="flex shrink-0 items-center gap-3">
                 <Link
+                  prefetch={false}
                   href={`/purchases/new?card=${card.id}`}
                   className="btn-ghost px-3 py-1 text-xs text-muted"
                 >

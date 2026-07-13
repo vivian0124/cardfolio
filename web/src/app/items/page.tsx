@@ -21,17 +21,23 @@ type ItemRow = {
 
 export default async function ItemsPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
 
-  const { data } = await supabase
-    .from("inventory_items")
-    .select(
-      "id, item_type, custom_name, condition, grading, status, cards(image_url), purchase_lots(quantity, price, fees, exchange_rate, sales(quantity, price, fees, exchange_rate))"
-    )
-    .order("created_at", { ascending: false });
+  // 身分驗證與查詢平行跑，省一趟資料庫往返
+  const [
+    {
+      data: { user },
+    },
+    { data },
+  ] = await Promise.all([
+    supabase.auth.getUser(),
+    supabase
+      .from("inventory_items")
+      .select(
+        "id, item_type, custom_name, condition, grading, status, cards(image_url), purchase_lots(quantity, price, fees, exchange_rate, sales(quantity, price, fees, exchange_rate))"
+      )
+      .order("created_at", { ascending: false }),
+  ]);
+  if (!user) redirect("/login");
 
   const items = (data ?? []) as ItemRow[];
   const holding = items.filter((i) => i.status === "holding");
@@ -47,6 +53,7 @@ export default async function ItemsPage() {
     return (
       <Link
         key={item.id}
+        prefetch={false}
         href={`/items/${item.id}`}
         className="glass glass-hover flex items-center justify-between gap-3 p-3"
       >

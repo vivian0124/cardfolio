@@ -238,6 +238,7 @@ export default function CardGrid({
             <div className="flex items-center justify-between px-0.5">
               <WishlistButton cardId={c.id} initialIn={c.wished} />
               <Link
+                prefetch={false}
                 href={`/purchases/new?card=${c.id}`}
                 className="btn-ghost px-2 py-0.5 text-xs text-muted"
               >
