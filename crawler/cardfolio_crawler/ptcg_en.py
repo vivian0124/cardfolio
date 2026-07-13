@@ -75,7 +75,10 @@ def fetch_cards(set_code: str) -> list[dict]:
     rows = []
     for c in _paged(
         "cards",
-        {"q": f"set.id:{set_code}", "select": "number,name,rarity,images"},
+        {
+            "q": f"set.id:{set_code}",
+            "select": "number,name,rarity,images,supertype,types",
+        },
     ):
         rows.append(
             {
@@ -83,6 +86,8 @@ def fetch_cards(set_code: str) -> list[dict]:
                 "name": c["name"],
                 "rarity": c.get("rarity"),
                 "image_url": (c.get("images") or {}).get("small"),
+                "supertype": c.get("supertype"),
+                "types": c.get("types"),
             }
         )
     return rows

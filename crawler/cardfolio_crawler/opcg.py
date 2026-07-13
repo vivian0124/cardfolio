@@ -50,8 +50,18 @@ def fetch_cards(base: str, series_value: str) -> list[dict]:
     for dl in soup.select("dl.modalCol"):
         card_no = (dl.get("id") or "").strip()
         name_el = dl.select_one(".cardName")
+        # infoCol：卡號 | 稀有度 | 卡種(LEADER/CHARACTER/EVENT/STAGE/DON)
         info_spans = dl.select(".infoCol span")
         rarity = info_spans[1].get_text(strip=True) if len(info_spans) > 1 else None
+        category = info_spans[2].get_text(strip=True) if len(info_spans) > 2 else None
+        # 顏色：<div class="color"><h3>Color</h3>Red</div> → 去掉標題只留值
+        color = None
+        color_el = dl.select_one(".backCol .color")
+        if color_el:
+            h3 = color_el.select_one("h3")
+            if h3:
+                h3.extract()
+            color = color_el.get_text(strip=True) or None
         img = dl.select_one(".frontCol img")
         image_url = None
         if img:
@@ -66,6 +76,8 @@ def fetch_cards(base: str, series_value: str) -> list[dict]:
                 "name": name_el.get_text(strip=True),
                 "rarity": rarity,
                 "image_url": image_url,
+                "color": color,
+                "category": category,
             }
         )
     return rows

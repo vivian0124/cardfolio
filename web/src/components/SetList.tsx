@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import CardThumb from "@/components/CardThumb";
 import { createClient } from "@/lib/supabase/client";
 
@@ -36,6 +36,8 @@ export default function SetList({
 }) {
   const [q, setQ] = useState(initialQuery ?? "");
   const [ownedOnly, setOwnedOnly] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [selectedYears, setSelectedYears] = useState<Set<string>>(new Set());
   // set_id -> 該系列中名稱符合關鍵字的卡（含縮圖）
   const [matchesBySet, setMatchesBySet] = useState<Map<string, MatchedCard[]>>(
     new Map()
@@ -98,8 +100,29 @@ export default function SetList({
     };
   }, [keyword, game, lang]);
 
+  // 出版年份選項（依現有系列的 release_date 動態產生，新到舊）
+  const years = useMemo(() => {
+    const set = new Set<string>();
+    for (const s of sets) {
+      if (s.release_date) set.add(s.release_date.slice(0, 4));
+    }
+    return [...set].sort().reverse();
+  }, [sets]);
+
+  const toggleYear = (y: string) =>
+    setSelectedYears((prev) => {
+      const next = new Set(prev);
+      if (next.has(y)) next.delete(y);
+      else next.add(y);
+      return next;
+    });
+
   const filtered = sets.filter((s) => {
     if (ownedOnly && s.owned === 0) return false;
+    if (selectedYears.size > 0) {
+      const y = s.release_date?.slice(0, 4);
+      if (!y || !selectedYears.has(y)) return false;
+    }
     if (!keyword) return true;
     return (
       s.name.toLowerCase().includes(keyword) ||
@@ -127,7 +150,47 @@ export default function SetList({
         >
           只看有收藏
         </button>
+        {years.length > 1 && (
+          <button
+            type="button"
+            onClick={() => setShowFilters((v) => !v)}
+            className={`shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-xs ${
+              selectedYears.size > 0 ? "btn-accent" : "btn-ghost text-muted"
+            }`}
+          >
+            年份{selectedYears.size > 0 ? ` ${selectedYears.size}` : ""}
+          </button>
+        )}
       </div>
+
+      {showFilters && years.length > 1 && (
+        <div className="glass flex flex-col gap-2 p-3">
+          <span className="text-xs font-medium text-muted">出版年份</span>
+          <div className="flex flex-wrap gap-1.5">
+            {years.map((y) => (
+              <button
+                key={y}
+                type="button"
+                onClick={() => toggleYear(y)}
+                className={`rounded-full px-2.5 py-1 text-xs ${
+                  selectedYears.has(y) ? "btn-accent" : "btn-ghost text-muted"
+                }`}
+              >
+                {y}
+              </button>
+            ))}
+          </div>
+          {selectedYears.size > 0 && (
+            <button
+              type="button"
+              onClick={() => setSelectedYears(new Set())}
+              className="self-start text-xs text-muted underline underline-offset-4"
+            >
+              清除年份
+            </button>
+          )}
+        </div>
+      )}
 
       {searchingCards && <p className="text-xs text-muted">搜尋卡片中…</p>}
 
