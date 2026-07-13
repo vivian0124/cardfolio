@@ -96,7 +96,7 @@ export default function CardSearchInput({
       )}
 
       {open && (hits.length > 0 || searching) && (
-        <ul className="glass absolute z-20 mt-1 max-h-72 w-full overflow-auto">
+        <ul className="popover-panel absolute z-20 mt-1 max-h-72 w-full overflow-auto">
           {searching && <li className="px-3 py-2 text-xs text-muted">搜尋中…</li>}
           {hits.map((h) => (
             <li key={h.id}>

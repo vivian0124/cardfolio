@@ -82,6 +82,14 @@ button.glass:hover,
   box-shadow: 0 0 14px -6px var(--glow);
 }
 
+/* 浮層面板（下拉選單）：實心底色，避免疊在表單上看不清 */
+.popover-panel {
+  background: #0c130f;
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.7);
+}
+
 /* 主要 CTA：實心霓虹 */
 .btn-accent {
   background: linear-gradient(135deg, var(--accent), var(--accent-2));
