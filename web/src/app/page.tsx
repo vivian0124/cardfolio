@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import BottomNav from "@/components/BottomNav";
 import DashboardStats from "@/components/DashboardStats";
+import Logo from "@/components/Logo";
 import {
   computeStats,
   realizedRoi,
@@ -93,9 +94,12 @@ export default async function Home() {
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-lg flex-col gap-6 px-4 pb-24 pt-8 md:max-w-4xl">
       <header className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold tracking-tight text-accent">
-          CardFolio
-        </h1>
+        <div className="flex items-center gap-3">
+          <Logo size={36} />
+          <h1 className="text-2xl font-bold tracking-tight text-accent">
+            CardFolio
+          </h1>
+        </div>
         <form action="/auth/signout" method="post">
           <button
             type="submit"

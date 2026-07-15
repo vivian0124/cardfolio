@@ -82,6 +82,18 @@ button.glass:hover,
   box-shadow: 0 0 14px -6px var(--glow);
 }
 
+/* logo 的 C 環旋轉（loading 用） */
+@keyframes logo-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.logo-spin {
+  animation: logo-spin 1.4s linear infinite;
+  transform-origin: 36px 36px;
+}
+
 /* 浮層面板（下拉選單）：實心底色，避免疊在表單上看不清 */
 .popover-panel {
   background: #0c130f;

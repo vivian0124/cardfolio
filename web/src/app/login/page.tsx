@@ -4,6 +4,7 @@ import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import Logo from "@/components/Logo";
 
 function LoginContent() {
   const [loading, setLoading] = useState<"google" | "guest" | null>(null);
@@ -43,8 +44,9 @@ function LoginContent() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-8 px-6">
-      <div className="text-center">
-        <h1 className="mono-num text-4xl font-bold tracking-tight text-accent">
+      <div className="flex flex-col items-center text-center">
+        <Logo size={92} />
+        <h1 className="mono-num mt-4 text-4xl font-bold tracking-tight text-accent">
           CardFolio
         </h1>
         <p className="mt-2 text-sm text-muted">卡牌投資記帳・收藏圖鑑</p>
