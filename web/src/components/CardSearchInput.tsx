@@ -30,6 +30,7 @@ export default function CardSearchInput({
   const [hits, setHits] = useState<CardHit[]>([]);
   const [open, setOpen] = useState(false);
   const [searching, setSearching] = useState(false);
+  const [lang, setLang] = useState<"all" | "ja" | "en" | "zh-TW">("all");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const boxRef = useRef<HTMLDivElement>(null);
 
@@ -43,7 +44,7 @@ export default function CardSearchInput({
     return () => document.removeEventListener("mousedown", onDown);
   }, []);
 
-  const search = (q: string) => {
+  const search = (q: string, activeLang: "all" | "ja" | "en" | "zh-TW") => {
     if (timer.current) clearTimeout(timer.current);
     if (q.trim().length < 2) {
       setHits([]);
@@ -54,13 +55,16 @@ export default function CardSearchInput({
       const supabase = createClient();
       const kw = q.trim();
       // 卡名、卡號、或繁中別名(OPCG 才有)任一符合
-      const { data } = await supabase
+      let query = supabase
         .from("cards")
         .select(
           "id, name, card_no, image_url, card_sets!inner(code, language, game_id)"
         )
-        .or(`name.ilike.%${kw}%,card_no.ilike.%${kw}%,name_zh.ilike.%${kw}%`)
-        .limit(12);
+        .or(`name.ilike.%${kw}%,card_no.ilike.%${kw}%,name_zh.ilike.%${kw}%`);
+      if (activeLang !== "all") {
+        query = query.eq("card_sets.language", activeLang);
+      }
+      const { data } = await query.limit(12);
       setHits(
         (data ?? []).map((c) => ({
           id: c.id,
@@ -75,8 +79,32 @@ export default function CardSearchInput({
     }, 300);
   };
 
+  const langOptions: { key: "all" | "ja" | "en" | "zh-TW"; label: string }[] = [
+    { key: "all", label: "全部語系" },
+    { key: "ja", label: "日" },
+    { key: "en", label: "英" },
+    { key: "zh-TW", label: "繁中" },
+  ];
+
   return (
     <div className="relative" ref={boxRef}>
+      <div className="mb-1.5 flex gap-1.5">
+        {langOptions.map((opt) => (
+          <button
+            key={opt.key}
+            type="button"
+            onClick={() => {
+              setLang(opt.key);
+              search(value, opt.key);
+            }}
+            className={`rounded-full px-2.5 py-1 text-xs ${
+              lang === opt.key ? "btn-accent" : "btn-ghost text-muted"
+            }`}
+          >
+            {opt.label}
+          </button>
+        ))}
+      </div>
       <input
         type="text"
         className="field"
@@ -85,7 +113,7 @@ export default function CardSearchInput({
         onChange={(e) => {
           // 手動改字就解除已選卡的關聯
           onChange(e.target.value, null);
-          search(e.target.value);
+          search(e.target.value, lang);
         }}
         onFocus={() => hits.length > 0 && setOpen(true)}
       />

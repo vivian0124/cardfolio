@@ -8,6 +8,7 @@ import MarketPriceForm from "@/components/MarketPriceForm";
 import { deleteItem, deleteSale } from "@/app/actions";
 import { fmtMoney, fmtTWD } from "@/lib/format";
 import { yuyuTeiSearchUrl } from "@/lib/priceLinks";
+import { getJapaneseCardName } from "@/lib/catalog";
 import {
   lotCostTWD,
   lotRemaining,
@@ -57,7 +58,7 @@ export default async function ItemDetailPage({
     supabase
       .from("inventory_items")
       .select(
-        "id, item_type, custom_name, condition, grading, status, note, market_price_twd, market_price_updated_at, cards(name, card_sets(game_id)), purchase_lots(id, quantity, price, currency, exchange_rate, fees, channel, purchased_at, note, sales(id, quantity, price, currency, exchange_rate, fees, buyer_note, sold_at))"
+        "id, item_type, custom_name, condition, grading, status, note, market_price_twd, market_price_updated_at, cards(name, card_no, card_sets(game_id, code)), purchase_lots(id, quantity, price, currency, exchange_rate, fees, channel, purchased_at, note, sales(id, quantity, price, currency, exchange_rate, fees, buyer_note, sold_at))"
       )
       .eq("id", id)
       .single(),
@@ -71,9 +72,19 @@ export default async function ItemDetailPage({
       ? linkedCard.card_sets[0]
       : linkedCard.card_sets
     : null;
+  // yuyu-tei 是日本賣場，不論卡片記帳時連結的是哪個語言版本，
+  // 都用日文名稱去搜才搜得到；找不到日文版就退回原本名稱
+  const japaneseName =
+    linkedCard && linkedSet
+      ? await getJapaneseCardName(
+          linkedSet.game_id,
+          linkedSet.code,
+          linkedCard.card_no
+        )
+      : null;
   const priceSearchUrl =
     linkedCard && linkedSet
-      ? yuyuTeiSearchUrl(linkedSet.game_id, linkedCard.name)
+      ? yuyuTeiSearchUrl(linkedSet.game_id, japaneseName ?? linkedCard.name)
       : null;
 
   const marketPrice =

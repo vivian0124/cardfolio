@@ -88,3 +88,34 @@ export const getSetWithCards = unstable_cache(
   ["catalog-set-with-cards"],
   { revalidate: 3600 }
 );
+
+/**
+ * 找同一張卡的日文版名稱：同 game/系列代碼(code)/卡號，但 language='ja'。
+ * 用於 yuyu-tei 這類日本賣場搜尋——不論使用者記帳時選的是哪個語言版本，
+ * 都用日文名稱去搜才搜得到。找不到日文版就回傳 null（呼叫端 fallback 原名）。
+ */
+export const getJapaneseCardName = unstable_cache(
+  async (
+    gameId: string,
+    setCode: string,
+    cardNo: string
+  ): Promise<string | null> => {
+    const { data: jaSet } = await catalogClient()
+      .from("card_sets")
+      .select("id")
+      .eq("game_id", gameId)
+      .eq("code", setCode)
+      .eq("language", "ja")
+      .maybeSingle();
+    if (!jaSet) return null;
+    const { data: jaCard } = await catalogClient()
+      .from("cards")
+      .select("name")
+      .eq("set_id", jaSet.id)
+      .eq("card_no", cardNo)
+      .maybeSingle();
+    return jaCard?.name ?? null;
+  },
+  ["catalog-japanese-card-name"],
+  { revalidate: 3600 }
+);
