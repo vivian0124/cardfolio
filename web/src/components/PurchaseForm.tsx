@@ -99,7 +99,7 @@ export default function PurchaseForm({
   return (
     <div className="flex flex-col gap-5">
       {/* 整單共用欄位 */}
-      <section className="grid grid-cols-2 gap-3 glass p-4">
+      <section className="grid grid-cols-1 gap-3 glass p-4 sm:grid-cols-2">
         <div>
           <label className={labelCls}>買入日期</label>
           <input
