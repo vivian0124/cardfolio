@@ -3,13 +3,13 @@
 :root {
   --background: #080b09;
   --foreground: #d9f7e3;
-  --surface: rgba(255, 255, 255, 0.035);
-  --surface-strong: rgba(255, 255, 255, 0.06);
-  --border: rgba(74, 222, 128, 0.16);
-  --border-strong: rgba(74, 222, 128, 0.4);
+  --surface: rgba(255, 255, 255, 0.05);
+  --surface-strong: rgba(255, 255, 255, 0.08);
+  --border: rgba(74, 222, 128, 0.24);
+  --border-strong: rgba(74, 222, 128, 0.5);
   --accent: #4ade80;
   --accent-2: #34d399;
-  --muted: #6b8a75;
+  --muted: #9bb8a7;
   --glow: rgba(74, 222, 128, 0.22);
 }
 
