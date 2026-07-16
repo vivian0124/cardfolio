@@ -228,12 +228,12 @@ export default function CardGrid({
                 {c.name}
               </div>
             )}
-            <div className="flex items-center justify-between px-0.5 text-xs text-muted">
-              <span className="truncate">
-                {c.card_no}
-                {c.rarity && `・${c.rarity}`}
+            <div className="flex items-start justify-between gap-1 px-0.5 text-xs text-muted">
+              <span className="min-w-0 break-words">
+                <span className="block truncate">{c.card_no}</span>
+                {c.rarity && <span className="block truncate">{c.rarity}</span>}
               </span>
-              {c.owned && <span className="text-accent">✓</span>}
+              {c.owned && <span className="shrink-0 text-accent">✓</span>}
             </div>
             <div className="flex items-center justify-between px-0.5">
               <WishlistButton cardId={c.id} initialIn={c.wished} />

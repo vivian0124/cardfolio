@@ -14,8 +14,11 @@ export default function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-10 border-t border-border bg-background/80 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-lg">
+    <nav
+      className="fixed inset-x-0 bottom-0 z-10 border-t border-border bg-background/80 backdrop-blur-xl"
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+    >
+      <div className="mx-auto flex w-full max-w-lg md:max-w-4xl">
         {tabs.map((tab) => {
           const active =
             tab.href === "/" ? pathname === "/" : pathname.startsWith(tab.href);
