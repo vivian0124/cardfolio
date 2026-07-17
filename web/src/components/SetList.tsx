@@ -38,6 +38,9 @@ export default function SetList({
   const [ownedOnly, setOwnedOnly] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [selectedYears, setSelectedYears] = useState<Set<string>>(new Set());
+  const [sortKey, setSortKey] = useState<"release" | "progress" | "code">(
+    "release"
+  );
   // set_id -> 該系列中名稱符合關鍵字的卡（含縮圖）
   const [matchesBySet, setMatchesBySet] = useState<Map<string, MatchedCard[]>>(
     new Map()
@@ -131,6 +134,20 @@ export default function SetList({
     );
   });
 
+  // 排序只改變顯示順序，不影響上面的篩選結果
+  const sorted = useMemo(() => {
+    const progressOf = (s: SetListRow) =>
+      s.total_cards && s.total_cards > 0 ? s.owned / s.total_cards : 0;
+    const copy = [...filtered];
+    if (sortKey === "progress") {
+      copy.sort((a, b) => progressOf(b) - progressOf(a));
+    } else if (sortKey === "code") {
+      copy.sort((a, b) => a.code.localeCompare(b.code));
+    }
+    // "release" 沿用伺服器端已排好的順序（release_date 新到舊）
+    return copy;
+  }, [filtered, sortKey]);
+
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-center gap-2">
@@ -192,16 +209,31 @@ export default function SetList({
         </div>
       )}
 
+      <div className="flex items-center gap-2 text-xs">
+        <span className="text-muted">排序</span>
+        <select
+          className="field w-auto py-1 text-xs"
+          value={sortKey}
+          onChange={(e) =>
+            setSortKey(e.target.value as "release" | "progress" | "code")
+          }
+        >
+          <option value="release">出版日期（新到舊）</option>
+          <option value="progress">收藏進度（高到低）</option>
+          <option value="code">系列代碼</option>
+        </select>
+      </div>
+
       {searchingCards && <p className="text-xs text-muted">搜尋卡片中…</p>}
 
-      {!searchingCards && filtered.length === 0 && (
+      {!searchingCards && sorted.length === 0 && (
         <p className="py-10 text-center text-sm text-muted">
           沒有符合的系列或卡片
         </p>
       )}
 
       <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-        {filtered.map((s) => {
+        {sorted.map((s) => {
           const total = s.total_cards;
           const pct =
             total && total > 0 ? Math.min(100, (s.owned / total) * 100) : null;

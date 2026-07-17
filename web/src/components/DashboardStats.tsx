@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import TrendChart from "@/components/TrendChart";
 
 const RATES_KEY = "cardfolio:display-currency";
 // 台幣兌換率預設值，僅供起始參考，使用者可自行修改成當下實際匯率
@@ -20,6 +21,7 @@ export default function DashboardStats({
   unrealizedPnl,
   topGainers,
   topLosers,
+  monthlySeries,
 }: {
   invested: number;
   recovered: number;
@@ -29,6 +31,7 @@ export default function DashboardStats({
   unrealizedPnl: number | null;
   topGainers: RankRow[];
   topLosers: RankRow[];
+  monthlySeries: { month: string; cumulative: number }[];
 }) {
   const [currency, setCurrency] = useState<Currency>("TWD");
   const [rates, setRates] = useState(DEFAULT_RATES);
@@ -117,6 +120,28 @@ export default function DashboardStats({
           </div>
         ))}
       </section>
+
+      {monthlySeries.length >= 2 && (
+        <section className="glass flex flex-col gap-2 p-4">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted">投入成長曲線</span>
+            <span className="mono-num font-semibold">
+              {fmt(monthlySeries[monthlySeries.length - 1].cumulative)}
+            </span>
+          </div>
+          <TrendChart
+            points={monthlySeries.map((p) => ({
+              month: p.month,
+              value: convert(p.cumulative),
+            }))}
+            format={(v) =>
+              currency === "TWD"
+                ? `NT$ ${Math.round(v).toLocaleString("zh-TW")}`
+                : `${currency} ${Math.round(v).toLocaleString("zh-TW")}`
+            }
+          />
+        </section>
+      )}
 
       <section className="glass flex flex-col gap-2 p-4">
         <div className="flex items-center justify-between text-sm">

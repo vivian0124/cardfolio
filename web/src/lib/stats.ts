@@ -69,6 +69,23 @@ export function computeStats(lots: LotNumbers[]): PortfolioStats {
   };
 }
 
+/** 依買入月份累計投入成本，月份由舊到新排序（沒有買入紀錄的月份不會補值） */
+export function monthlyInvestedSeries(
+  lots: (LotNumbers & { purchased_at: string })[]
+): { month: string; cumulative: number }[] {
+  const byMonth = new Map<string, number>();
+  for (const lot of lots) {
+    const month = lot.purchased_at.slice(0, 7); // YYYY-MM
+    byMonth.set(month, (byMonth.get(month) ?? 0) + lotCostTWD(lot));
+  }
+  const months = [...byMonth.keys()].sort();
+  let running = 0;
+  return months.map((month) => {
+    running += byMonth.get(month)!;
+    return { month, cumulative: running };
+  });
+}
+
 /** 已實現 ROI（賣出淨額相對於賣出部分成本的報酬率），沒有已實現交易時回傳 null */
 export function realizedRoi(stats: PortfolioStats): number | null {
   return stats.soldCost > 0 ? stats.realizedPnl / stats.soldCost : null;

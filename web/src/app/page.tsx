@@ -6,6 +6,7 @@ import DashboardStats from "@/components/DashboardStats";
 import Logo from "@/components/Logo";
 import {
   computeStats,
+  monthlyInvestedSeries,
   realizedRoi,
   unrealizedPnl,
   type LotNumbers,
@@ -45,7 +46,7 @@ export default async function Home() {
     supabase
       .from("inventory_items")
       .select(
-        "id, custom_name, market_price_twd, purchase_lots(quantity, price, fees, exchange_rate, sales(quantity, price, fees, exchange_rate))"
+        "id, custom_name, market_price_twd, purchase_lots(quantity, price, fees, exchange_rate, purchased_at, sales(quantity, price, fees, exchange_rate))"
       ),
   ]);
 
@@ -55,12 +56,14 @@ export default async function Home() {
     id: string;
     custom_name: string | null;
     market_price_twd: string | number | null;
-    purchase_lots: LotNumbers[];
+    purchase_lots: (LotNumbers & { purchased_at: string })[];
   };
   const items = (itemsData ?? []) as RankItem[];
 
-  const stats = computeStats(items.flatMap((i) => i.purchase_lots));
+  const allLots = items.flatMap((i) => i.purchase_lots);
+  const stats = computeStats(allLots);
   const roi = realizedRoi(stats);
+  const monthlySeries = monthlyInvestedSeries(allLots);
 
   const ranked = items
     .map((item) => ({
@@ -119,6 +122,7 @@ export default async function Home() {
         unrealizedPnl={totalUnrealizedPnl}
         topGainers={topGainers}
         topLosers={topLosers}
+        monthlySeries={monthlySeries}
       />
 
       <Link
